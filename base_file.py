@@ -15,7 +15,7 @@ FPS = 60
 class main_window:
     def __init__(self):
         # PARAMETER
-        pygame.display.set_caption("Smash Run")
+        pygame.display.set_caption("title here")
         self.screen = pygame.display.set_mode(SCREEN) #pygame.FULLSCREEN
         self.clock = pygame.time.Clock()
 

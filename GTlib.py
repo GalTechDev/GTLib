@@ -19,12 +19,15 @@ for i in range(2):
 
 def init(ref: int=0):
     '''Convert active file to a ready to code file for pygame dev'''
-    if ref==0:
-        base_code = "base_file.py"
+    dic={0:"base_file.py"}
+    if ref not in dic.keys():
+        ref=0
+    base_code = dic[ref]
     path = sys.argv[0]
     with open(base_code, 'r') as base:
         with open(path, 'w') as file:
             file.write(base.read())
+
     print("Template Succesfuly applyed")
 
 
