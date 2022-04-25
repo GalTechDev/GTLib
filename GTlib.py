@@ -1,10 +1,28 @@
+from asyncore import write
 import pygame
 import pyperclip
+import sys
 
-FONT = pygame.font.Font(None, 32)
-COLOR_TEXT = pygame.Color('floralwhite')
-COLOR_INACTIVE = pygame.Color('lightskyblue3')
-COLOR_ACTIVE = pygame.Color('dodgerblue2')
+for i in range(2):
+    try:
+        FONT = pygame.font.Font(None, 32)
+        COLOR_TEXT = pygame.Color('floralwhite')
+        COLOR_INACTIVE = pygame.Color('lightskyblue3')
+        COLOR_ACTIVE = pygame.Color('dodgerblue2')
+    except:
+        exec("import pygame")
+        exec("pygame.init()")
+        print("Please import and init pygame before GTlib")
+
+class init():
+    def __init__(self):
+        '''Convert active file to a ready to code file for pygame dev'''
+        base_code = "base_file.py"
+        path = sys.argv[0]
+        with open('base_file.py', 'r') as base:
+            with open(path, 'w') as file:
+                file.write(base.read())
+
 
 class square(pygame.sprite.Sprite):
     def __init__(self,x:int(),y:int(),color,size_x:int(),size_y:int()):
