@@ -7,7 +7,7 @@ COLOR_INACTIVE = pygame.Color('lightskyblue3')
 COLOR_ACTIVE = pygame.Color('dodgerblue2')
 
 class square(pygame.sprite.Sprite):
-    def __init__(self,x:int(),y:int(),color:str(),size_x:int(),size_y:int()):
+    def __init__(self,x:int(),y:int(),color,size_x:int(),size_y:int()):
         '''Make a simple square that include some methode.'''
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((size_x,size_y))
@@ -37,7 +37,7 @@ class Image(pygame.sprite.Sprite):
 
 
 class InputBox(pygame.sprite.Sprite):
-    def __init__(self, x:int(), y:int(), size_x:int(), size_y:int(), inactive_color, active_color,font=FONT, min_char=0 ,max_char=None,text='',titre='',show_valide=False):
+    def __init__(self, x:int(), y:int(), size_x:int(), size_y:int(),text='', inactive_color=COLOR_INACTIVE, active_color=COLOR_ACTIVE,font=FONT, min_char=0 ,max_char=None):
         '''An input box object: Need intern event() and draw() fonction call to work correctly'''
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((size_x,size_y))
@@ -103,9 +103,8 @@ class InputBox(pygame.sprite.Sprite):
 
 
 class Text():
-    def __init__(self, x:int(), y:int(), w:int(), h:int(), text:str(), data="", color="White", font=FONT, hidden=True):
+    def __init__(self, x:int(), y:int(), w:int(), h:int(), text:str(), data="", color="White", font=FONT, hidden=False):
         '''A Text object: Need to call draw() intern fonction to work'''
-        self.FONT = pygame.font.Font(None, 32)
         self.rect = pygame.Rect(x, y, w, h)
         self.color = color
         self.data = data
