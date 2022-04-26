@@ -62,15 +62,18 @@ class Image(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(ref)
         self.rect = self.image.get_rect()
-        self.rect = (x,y)
+        self.rect.x = x
+        self.rect.y = y
 
 
 class InputBox(pygame.sprite.Sprite):
-    def __init__(self, x:int, y:int, size_x:int, size_y:int,text: str='', inactive_color=COLOR_INACTIVE, active_color=COLOR_ACTIVE,font=FONT, min_char: int=0 ,max_char: int=None):
+    def __init__(self, x:int, y:int, size_x:int, size_y:int,text: str='', inactive_color=COLOR_INACTIVE, active_color=COLOR_ACTIVE,font=FONT, min_char: int=0 ,max_char=None):
         '''An input box object: Need intern event() and draw() fonction call to work correctly'''
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((size_x,size_y))
-        self.rect = (x,y)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
         self.size_x = size_x
         self.size_y = size_y
         self.active = False
@@ -78,13 +81,12 @@ class InputBox(pygame.sprite.Sprite):
         self.inactive_color = inactive_color
         self.active_color = active_color
         self.color = inactive_color
-        self.text = Text(self.rect.x+5, self.rect.y+5, text)
+        self.text = Text(self.rect.x, self.rect.y, self.size_x,self.size_y, text, hidden=True)
         self.text.font = font
 
         self.valide = False
         self.min_char = min_char
         self.max_char = max_char
-        self.text.txt_surface = self.text.font.render(self.text.text, True, self.text.color)
         
     def event(self, events:list):
         for event in events:
@@ -93,7 +95,7 @@ class InputBox(pygame.sprite.Sprite):
                     self.active = not self.active
                 else:
                     self.active = False
-                self.color = self.active_color if self.active else self.inactive_color
+                self.color = self.active_color if self.active and not self.valide else self.inactive_color
 
             if event.type == pygame.KEYDOWN:
                 if self.active and not self.valide:
@@ -117,7 +119,7 @@ class InputBox(pygame.sprite.Sprite):
         '''Internal fonction, please don't use it.'''
         # Resize the box if the text is too long.
         width = max(self.size_x, self.text.txt_surface.get_width()+10)
-        self.size_x = width
+        self.rect.width = width
 
     def get(self) -> str:
         '''Return entered text.'''
@@ -125,7 +127,7 @@ class InputBox(pygame.sprite.Sprite):
 
     def draw(self, screen):
         # Blit the text.
-        screen.blit(self.text.txt_surface, (self.rect.x+5, self.rect.y+5))
+        self.text.draw(screen)
         # Blit the rect.
         pygame.draw.rect(screen, self.color, self.rect, 2)
 

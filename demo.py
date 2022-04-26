@@ -31,7 +31,11 @@ class main_window:
 
         # OBJECTS
         self.background = gt.Image(0,0,"Image/black.png")
+        self.square = gt.square(0,0,"blue",10,10)
+        self.inputbox = gt.InputBox(10,10,200,30,"Entrez du text")
         self.all_sprites.add(self.background)
+        self.all_sprites.add(self.square)
+        
 
         # Call
         self.call_menu()
@@ -62,8 +66,9 @@ class main_window:
 
     
     def events(self):
-        
         all_events = pygame.event.get()
+        self.square.rect = pygame.mouse.get_pos()
+        self.inputbox.event(all_events)
         if all_events==[]:
             if self.menu_is_running:
                 #self.menu.event()
@@ -81,7 +86,7 @@ class main_window:
 
     def draw(self):
         self.all_sprites.draw(self.screen) # actualise les sprites
-
+        self.inputbox.draw(self.screen)
         #if self.menu_is_running:
         #    self.menu.group_main_menu.draw(self.screen)
         pygame.display.flip()
