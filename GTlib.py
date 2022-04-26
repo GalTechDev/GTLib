@@ -32,15 +32,16 @@ def init(ref: int=0):
     print("Template Succesfuly applyed")
 
 
-class square(pygame.sprite.Sprite):
-    def __init__(self,x:int,y:int,color,size_x:int,size_y:int):
+class Square(pygame.sprite.Sprite):
+    def __init__(self, x:int, y:int, color, size_x:int, size_y:int):
         '''Make a simple square that include some methode.'''
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((size_x,size_y))
         self.image.fill(pygame.Color(color))
         self.color = color
         self.rect = self.image.get_rect()
-        self.rect = (x,y)
+        self.rect.x = x
+        self.rect.y = y
         self.size_x = size_x
         self.size_y = size_y
 
@@ -57,7 +58,7 @@ class square(pygame.sprite.Sprite):
 
 
 class Image(pygame.sprite.Sprite):
-    def __init__(self,x:int,y:int,ref:str):
+    def __init__(self, x:int, y:int, ref:str):
         '''Simple way to manage image and rect'''
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(ref)
@@ -69,7 +70,6 @@ class Image(pygame.sprite.Sprite):
     def rescale(self,size_x,size_y):
         self.image = pygame.transform.scale(self.image, (size_x, size_y))
         self.rect = self.image.get_rect()
-
 
 
 class InputBox(pygame.sprite.Sprite):
@@ -162,3 +162,24 @@ class Text():
         # Blit the rect.
         if not self.hidden:
             pygame.draw.rect(screen, self.color, self.rect, 2)
+
+
+class boutton(pygame.sprite.Sprite):
+    def __init__(self, x, y, square:Square, text:Text):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((square.size_x,square.size_y))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+        self.square = square
+        self.square.rect.x+=x
+        self.square.rect.y+=y
+
+        self.text = text
+        self.text.rect.x+=x
+        self.text.rect.y+=y
+
+    def draw(self, screen):
+        self.text.draw(screen)
+

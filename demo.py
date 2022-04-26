@@ -31,10 +31,12 @@ class main_window:
 
         # OBJECTS
         self.background = gt.Image(0,0,"Image/black.png")
-        self.square = gt.square(0,0,"blue",10,10)
+        self.square = gt.Square(0,0,"blue",10,10)
         self.inputbox = gt.InputBox(10,10,200,30,default_text="Entrez du text")
+        self.boutton = gt.boutton(10,100,gt.Square(0,0,"white",100,30),gt.Text(0,0,100,30,"Bonjour",hidden=True, color="black"))
         self.all_sprites.add(self.background)
         self.all_sprites.add(self.square)
+        self.all_sprites.add(self.boutton.square)
         
 
         # Call
@@ -87,6 +89,7 @@ class main_window:
     def draw(self):
         self.all_sprites.draw(self.screen) # actualise les sprites
         self.inputbox.draw(self.screen)
+        self.boutton.draw(self.screen)
         #if self.menu_is_running:
         #    self.menu.group_main_menu.draw(self.screen)
         pygame.display.flip()
