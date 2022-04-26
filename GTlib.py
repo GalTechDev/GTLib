@@ -2,7 +2,7 @@ from asyncore import write
 import pygame
 import pyperclip
 import sys
-from PIL import Image as pilImage
+
 for i in range(2):
     try:
         FONT = pygame.font.Font(None, 32)
