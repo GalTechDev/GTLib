@@ -73,7 +73,7 @@ class Image(pygame.sprite.Sprite):
 
 
 class InputBox(pygame.sprite.Sprite):
-    def __init__(self, x:int, y:int, size_x:int, size_y:int,text: str='', inactive_color=COLOR_INACTIVE, active_color=COLOR_ACTIVE,font=FONT, min_char: int=0 ,max_char=None, default_text: str=""):
+    def __init__(self, x:int, y:int, size_x:int, size_y:int,text: str='', inactive_color=COLOR_INACTIVE, active_color=COLOR_ACTIVE,font=FONT, min_char: int=0 ,max_char=None, default_text: str="", autolock: bool=False):
         '''An input box object: Need intern event() and draw() fonction call to work correctly'''
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((size_x,size_y))
@@ -91,6 +91,7 @@ class InputBox(pygame.sprite.Sprite):
         self.text = Text(self.rect.x, self.rect.y, self.size_x,self.size_y, text, hidden=True)
         self.text.font = font
 
+        self.autolock = autolock
         self.valide = False
         self.min_char = min_char
         self.max_char = max_char
@@ -112,7 +113,8 @@ class InputBox(pygame.sprite.Sprite):
                     if event.key == pygame.K_BACKSPACE:
                         self.text.text = self.text.text[:-1]
                     elif event.key == pygame.K_RETURN:
-                        self.valide = True
+                        if self.autolock:
+                            self.valide = True
                     else:
                         if event.key == pygame.K_v and pygame.key.get_mods() & pygame.KMOD_CTRL:
                             self.text.text = str(pyperclip.paste())
