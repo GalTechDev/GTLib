@@ -26,10 +26,11 @@ class main_window:
 
         # RUNNING
         self.is_running=True
+        self.menu_is_running=True
         self.music_On=False
 
         # OBJECTS
-        self.background = pygame.image.load("Image/black.png")
+        self.background = gt.Image(0,0,"Image/black.png")
         self.all_sprites.add(self.background)
 
         # Call
@@ -79,7 +80,6 @@ class main_window:
                     pygame.quit()
 
     def draw(self):
-        self.screen.blit(self.background, (0,0)) # Dessine le backgound
         self.all_sprites.draw(self.screen) # actualise les sprites
 
         #if self.menu_is_running:

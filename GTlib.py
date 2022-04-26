@@ -9,6 +9,7 @@ for i in range(2):
         COLOR_TEXT = pygame.Color('floralwhite')
         COLOR_INACTIVE = pygame.Color('lightskyblue3')
         COLOR_ACTIVE = pygame.Color('dodgerblue2')
+        break
     except:
         exec("import pygame")
         exec("pygame.init()")
