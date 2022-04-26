@@ -2,7 +2,7 @@ from asyncore import write
 import pygame
 import pyperclip
 import sys
-
+from PIL import Image as pilImage
 for i in range(2):
     try:
         FONT = pygame.font.Font(None, 32)
@@ -61,13 +61,19 @@ class Image(pygame.sprite.Sprite):
         '''Simple way to manage image and rect'''
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(ref)
+        self.ref = ref
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
 
+    def rescale(self,size_x,size_y):
+        self.image = pygame.transform.scale(self.image, (size_x, size_y))
+        self.rect = self.image.get_rect()
+
+
 
 class InputBox(pygame.sprite.Sprite):
-    def __init__(self, x:int, y:int, size_x:int, size_y:int,text: str='', inactive_color=COLOR_INACTIVE, active_color=COLOR_ACTIVE,font=FONT, min_char: int=0 ,max_char=None):
+    def __init__(self, x:int, y:int, size_x:int, size_y:int,text: str='', inactive_color=COLOR_INACTIVE, active_color=COLOR_ACTIVE,font=FONT, min_char: int=0 ,max_char=None, default_text: str=""):
         '''An input box object: Need intern event() and draw() fonction call to work correctly'''
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((size_x,size_y))
@@ -81,6 +87,7 @@ class InputBox(pygame.sprite.Sprite):
         self.inactive_color = inactive_color
         self.active_color = active_color
         self.color = inactive_color
+        self.default_text = default_text
         self.text = Text(self.rect.x, self.rect.y, self.size_x,self.size_y, text, hidden=True)
         self.text.font = font
 
@@ -89,6 +96,9 @@ class InputBox(pygame.sprite.Sprite):
         self.max_char = max_char
         
     def event(self, events:list):
+        if not self.active and not self.valide:
+                    if self.get()=="":
+                        self.text.text = self.default_text
         for event in events:
             if event.type == pygame.MOUSEBUTTONUP:
                 if self.rect.collidepoint(pygame.mouse.get_pos()):
@@ -110,10 +120,10 @@ class InputBox(pygame.sprite.Sprite):
                             self.text.text += event.unicode
                         elif len(self.text.text)<self.max_char:
                             self.text.text += event.unicode
-                    # Re-render the text.
-                    self.text.txt_surface = self.text.font.render(self.text.text, True, self.color)
             if self.max_char == None:
                 self.update()
+        # Re-render the text.
+        self.text.txt_surface = self.text.font.render(self.text.text, True, self.color)
 
     def update(self):
         '''Internal fonction, please don't use it.'''
@@ -130,7 +140,6 @@ class InputBox(pygame.sprite.Sprite):
         self.text.draw(screen)
         # Blit the rect.
         pygame.draw.rect(screen, self.color, self.rect, 2)
-
 
 
 class Text():
