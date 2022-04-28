@@ -79,7 +79,7 @@ class Image(pygame.sprite.Sprite):
 
 
 class InputBox(pygame.sprite.Sprite):
-    def __init__(self, x:int, y:int, size_x:int, size_y:int,text: str='', inactive_color=COLOR_INACTIVE, active_color=COLOR_ACTIVE,font=FONT, min_char: int=0 ,max_char=None, default_text: str="", autolock: bool=False):
+    def __init__(self, x:int, y:int, size_x:int, size_y:int,text: str='', inactive_color=COLOR_INACTIVE, active_color=COLOR_ACTIVE,font=FONT, min_char: int=0 ,max_char: int=None, default_text: str="", autolock: bool=False):
         '''An input box object: Need intern event() and draw() fonction call to work correctly'''
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((size_x,size_y))
@@ -170,7 +170,7 @@ class Text():
             pygame.draw.rect(screen, self.color, self.rect, 2)
 
 
-class boutton(pygame.sprite.Sprite):
+class Boutton(pygame.sprite.Sprite):
     def __init__(self, x: int, y: int, square:Square, text:Text):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((square.size_x,square.size_y))
@@ -199,8 +199,8 @@ class boutton(pygame.sprite.Sprite):
     def draw(self, screen):
         self.text.draw(screen)
 
-class checkbox(pygame.sprite.Sprite):
-    def __init__(self, x: int, y: int, size: int, check_str: str="X",color_bg="white", color_rect="black", color_check="black", is_check: bool=False, check_str_size=None):
+class Checkbox(pygame.sprite.Sprite):
+    def __init__(self, x: int, y: int, size: int, check_str: str="X",color_bg="white", color_rect="black", color_check="black", is_check: bool=False, check_str_size: int=None):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((size,size))
         self.rect = self.image.get_rect()
