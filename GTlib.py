@@ -3,19 +3,25 @@ import pygame
 import pyperclip
 import sys
 
-for i in range(2):
+print("This Library need :\nimport pyperclip\nimport and init pygame before GTlib")
+try:
+    FONT = pygame.font.Font(None, 32)
+    COLOR_TEXT = pygame.Color('floralwhite')
+    COLOR_INACTIVE = pygame.Color('lightskyblue3')
+    COLOR_ACTIVE = pygame.Color('dodgerblue2')
+except:
     try:
-        FONT = pygame.font.Font(None, 32)
-        COLOR_TEXT = pygame.Color('floralwhite')
-        COLOR_INACTIVE = pygame.Color('lightskyblue3')
-        COLOR_ACTIVE = pygame.Color('dodgerblue2')
-        break
-    except:
         exec("import pygame")
         exec("pygame.init()")
-        print("Please import and init pygame before GTlib")
-        if i==1:
-            print("Pygame not detected, please install pygame")
+    except:
+        print("pygame not detected, please install pygame")
+    try:
+        exec("import pyperclip")
+    except:
+        print("pyperclip not detected, please install pyperclip")
+
+        
+            
 
 
 def init(ref: int=0):
@@ -152,7 +158,7 @@ class Text():
         self.data = data
         self.text = text
         self.font = font
-        self.txt_surface = FONT.render(self.text, True, self.color)
+        self.txt_surface = self.font.render(self.text, True, self.color)
         self.hidden = hidden
         
 
