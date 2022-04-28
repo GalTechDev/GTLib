@@ -186,11 +186,21 @@ class boutton(pygame.sprite.Sprite):
         self.text.rect.x+=x
         self.text.rect.y+=y
 
+        self.clicked = False
+
+    def event(self, events):
+        if self.clicked:
+            self.clicked = False
+        for event in events:
+            if event.type==pygame.MOUSEBUTTONUP:
+                if self.rect.collidepoint(pygame.mouse.get_pos()):
+                    self.clicked = True
+
     def draw(self, screen):
         self.text.draw(screen)
 
 class checkbox(pygame.sprite.Sprite):
-    def __init__(self, x: int, y: int, size: int, check_str: str="X",color_bg="white", color_rect="black", color_check="black", is_check: bool=False):
+    def __init__(self, x: int, y: int, size: int, check_str: str="X",color_bg="white", color_rect="black", color_check="black", is_check: bool=False, check_str_size=None):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((size,size))
         self.rect = self.image.get_rect()
@@ -202,16 +212,18 @@ class checkbox(pygame.sprite.Sprite):
         self.color_bg = color_bg
         self.square = Square(x,y,self.color_bg,self.size,self.size)
 
-        self.check = Text(x,y,size,size,check_str,color=color_check,font=pygame.font.Font(None,size))
+        self.check_str_size = check_str_size if not check_str_size is None else self.size
+        self.check = Text(x+size//10,y+size//15,size,size,check_str,color=color_check,font=pygame.font.Font(None,self.check_str_size), hidden=True)
         self.is_check = is_check
 
     def event(self, events):
         for event in events:
-            if event.type()==pygame.MOUSEBUTTONUP():
+            if event.type==pygame.MOUSEBUTTONUP:
                 if self.rect.collidepoint(pygame.mouse.get_pos()):
                     self.is_check = not self.is_check
 
     def draw(self, screen):
+        pygame.draw.rect(screen, self.color_rect, self.rect, 2)
         if self.is_check:
             self.check.draw(screen)
         
