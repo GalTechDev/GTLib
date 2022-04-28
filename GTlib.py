@@ -171,7 +171,7 @@ class Text():
 
 
 class boutton(pygame.sprite.Sprite):
-    def __init__(self, x, y, square:Square, text:Text):
+    def __init__(self, x: int, y: int, square:Square, text:Text):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((square.size_x,square.size_y))
         self.rect = self.image.get_rect()
@@ -188,4 +188,34 @@ class boutton(pygame.sprite.Sprite):
 
     def draw(self, screen):
         self.text.draw(screen)
+
+class checkbox(pygame.sprite.Sprite):
+    def __init__(self, x: int, y: int, size: int, check_str: str="X",color_bg="white", color_rect="black", color_check="black", is_check: bool=False):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((size,size))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.size = size
+        self.color_rect = color_rect
+
+        self.color_bg = color_bg
+        self.square = Square(x,y,self.color_bg,self.size,self.size)
+
+        self.check = Text(x,y,size,size,check_str,color=color_check,font=pygame.font.Font(None,size))
+        self.is_check = is_check
+
+    def event(self, events):
+        for event in events:
+            if event.type()==pygame.MOUSEBUTTONUP():
+                if self.rect.collidepoint(pygame.mouse.get_pos()):
+                    self.is_check = not self.is_check
+
+    def draw(self, screen):
+        if self.is_check:
+            self.check.draw(screen)
+        
+
+
+
 
