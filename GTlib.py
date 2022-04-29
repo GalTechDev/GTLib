@@ -3,6 +3,7 @@ import pygame
 import pyperclip
 import sys
 
+
 print("This Library need :\nimport pyperclip\nimport and init pygame before GTlib")
 try:
     FONT = pygame.font.Font(None, 32)
@@ -79,7 +80,7 @@ class Image(pygame.sprite.Sprite):
 
 
 class InputBox(pygame.sprite.Sprite):
-    def __init__(self, x:int, y:int, size_x:int, size_y:int,text: str='', inactive_color=COLOR_INACTIVE, active_color=COLOR_ACTIVE,font=FONT, min_char: int=0 ,max_char: int=None, default_text: str="", autolock: bool=False):
+    def __init__(self, x:int, y:int, size_x:int, size_y:int,text: str='', inactive_color=COLOR_INACTIVE, active_color=COLOR_ACTIVE,font=FONT, min_char: int=0 ,max_char: int=None, default_text: str="", autolock: bool=False, continute_intup: bool=False):
         '''An input box object: Need intern event() and draw() fonction call to work correctly'''
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((size_x,size_y))
@@ -98,14 +99,23 @@ class InputBox(pygame.sprite.Sprite):
         self.text.font = font
 
         self.autolock = autolock
+        self.cont_input = continute_intup
         self.valide = False
+        self.Backspace_pressed = False
         self.min_char = min_char
         self.max_char = max_char
+        self.idx_cursor = 0
         
     def event(self, events:list):
         if not self.active and not self.valide:
-                    if self.get()=="":
-                        self.text.text = self.default_text
+            if self.get()=="":
+                self.text.text = self.default_text
+
+        if self.Backspace_pressed and not self.valide:
+            self.text.text = self.text.text[:-1]
+            if not self.cont_input:
+                self.Backspace_pressed=False
+
         for event in events:
             if event.type == pygame.MOUSEBUTTONUP:
                 if self.rect.collidepoint(pygame.mouse.get_pos()):
@@ -114,13 +124,28 @@ class InputBox(pygame.sprite.Sprite):
                     self.active = False
                 self.color = self.active_color if self.active and not self.valide else self.inactive_color
 
+            if event.type == pygame.KEYUP:
+                self.Backspace_pressed = False
+
             if event.type == pygame.KEYDOWN:
                 if self.active and not self.valide:
                     if event.key == pygame.K_BACKSPACE:
-                        self.text.text = self.text.text[:-1]
+                        self.Backspace_pressed = True
+
                     elif event.key == pygame.K_RETURN:
                         if self.autolock:
                             self.valide = True
+                            self.Backspace_pressed=False
+                            self.color = self.inactive_color
+
+                    elif event.key == pygame.K_LEFT:
+                        if self.active and self.idx_cursor>0:
+                            self.idx_cursor-=1
+
+                    elif event.key == pygame.K_RIGHT:
+                        if self.active and self.idx_cursor<len(self.get()):
+                            self.idx_cursor+=1
+
                     else:
                         if event.key == pygame.K_v and pygame.key.get_mods() & pygame.KMOD_CTRL:
                             self.text.text = str(pyperclip.paste())
@@ -128,6 +153,7 @@ class InputBox(pygame.sprite.Sprite):
                             self.text.text += event.unicode
                         elif len(self.text.text)<self.max_char:
                             self.text.text += event.unicode
+
             if self.max_char == None:
                 self.update()
         # Re-render the text.
@@ -160,7 +186,10 @@ class Text():
         self.font = font
         self.txt_surface = self.font.render(self.text, True, self.color)
         self.hidden = hidden
-        
+
+    def set_text(self, new_text: str):
+        self.text = new_text
+        self.txt_surface = self.font.render(self.text, True, self.color)
 
     def draw(self, screen):
         # Blit the text.
