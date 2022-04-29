@@ -33,7 +33,7 @@ class main_window:
         self.background = gt.Image(0,0,"Image/black.png")
         self.square = gt.Square(0,0,"blue",10,10)
         self.inputbox = gt.InputBox(10,10,200,30,default_text="Entrez du text")
-        self.boutton = gt.Boutton(10,100,gt.Square(0,0,"white",100,30),gt.Text(0,0,100,30,"Bonjour",hidden=True, color="black",font=pygame.font.Font(None,32)))
+        self.boutton = gt.Boutton(10,100,gt.Square(0,0,"white",100,30),gt.Text(0,0,100,30,"Bonjour",hidden=True, color="black",font=pygame.font.Font(None,32)), color_hover="green", color_clic="blue")
         self.check = gt.Checkbox(300,10,30,color_rect="blue")
         self.all_sprites.add(self.background)
         self.all_sprites.add(self.boutton.square)
@@ -72,6 +72,7 @@ class main_window:
     def events(self):
         all_events = pygame.event.get()
         self.square.rect = pygame.mouse.get_pos()
+        self.boutton.event(all_events)
         self.inputbox.event(all_events)
         self.check.event(all_events)
         if all_events==[]:

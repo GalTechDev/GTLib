@@ -124,7 +124,7 @@ class InputBox(pygame.sprite.Sprite):
                     else:
                         if event.key == pygame.K_v and pygame.key.get_mods() & pygame.KMOD_CTRL:
                             self.text.text = str(pyperclip.paste())
-                        if self.max_char == None:
+                        elif self.max_char == None:
                             self.text.text += event.unicode
                         elif len(self.text.text)<self.max_char:
                             self.text.text += event.unicode
@@ -171,7 +171,7 @@ class Text():
 
 
 class Boutton(pygame.sprite.Sprite):
-    def __init__(self, x: int, y: int, square:Square, text:Text):
+    def __init__(self, x: int, y: int, square:Square, text:Text, color_hover=None, color_clic=None):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((square.size_x,square.size_y))
         self.rect = self.image.get_rect()
@@ -179,6 +179,9 @@ class Boutton(pygame.sprite.Sprite):
         self.rect.y = y
 
         self.square = square
+        self.square_color_n = self.square.color
+        self.square_color_h = color_hover
+        self.square_color_c = color_clic
         self.square.rect.x+=x
         self.square.rect.y+=y
 
@@ -188,16 +191,25 @@ class Boutton(pygame.sprite.Sprite):
 
         self.clicked = False
 
-    def event(self, events):
-        if self.clicked:
-            self.clicked = False
+
+    def event(self, events):          
         for event in events:
             if event.type==pygame.MOUSEBUTTONUP:
+                self.clicked = False
+            if event.type==pygame.MOUSEBUTTONDOWN:
                 if self.rect.collidepoint(pygame.mouse.get_pos()):
                     self.clicked = True
+        if self.clicked:
+            self.square.color = self.square_color_c if not self.square_color_c is None else self.square_color_n
+        elif self.rect.collidepoint(pygame.mouse.get_pos()):
+            self.square.color = self.square_color_h if not self.square_color_h is None else self.square_color_n
+        else:
+            self.square.color = self.square_color_n
+
 
     def draw(self, screen):
         self.text.draw(screen)
+        
 
 class Checkbox(pygame.sprite.Sprite):
     def __init__(self, x: int, y: int, size: int, check_str: str="X",color_bg="white", color_rect="black", color_check="black", is_check: bool=False, check_str_size: int=None):
