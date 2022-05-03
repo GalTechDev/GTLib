@@ -199,7 +199,7 @@ class Text():
             pygame.draw.rect(screen, self.color, self.rect, 2)
 
 
-class Boutton(pygame.sprite.Sprite):
+class Bouton(pygame.sprite.Sprite):
     def __init__(self, x: int, y: int, square:Square, text: Text=None, color_hover=None, color_clic=None):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((square.size_x,square.size_y))
@@ -280,15 +280,15 @@ class Checkbox(pygame.sprite.Sprite):
         if self.is_check:
             self.check.draw(screen)
         
-class Currsor(pygame.sprite.Sprite):
-    def __init__(self,x,y,size_x,size_y,vertical=False, horizontal=False):
+class Cursor(pygame.sprite.Sprite):
+    def __init__(self,x,y,size_x,size_y,square_size_x,square_size_y,vertical=False, horizontal=False):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((size_x,size_y))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
 
-        self.square = Square(self.rect.x+size_x//2-15,0,"blue",30,30)
+        self.square = Square(self.rect.x+size_x//2-15,0,"blue",square_size_x,square_size_y)
         self.val_x = 0
         self.val_y = 0
         self.vertical = vertical
@@ -297,7 +297,7 @@ class Currsor(pygame.sprite.Sprite):
 
     def get_stat(self):
         print(self.square.rect.y-self.rect.y, self.rect.h-self.square.rect.h)
-        print(self.val)
+        print(self.val_x, self.val_y)
         return [self.square.rect.y-self.rect.y, self.rect.h-self.square.rect.h]
 
     def set_cursor(self,x=None,y=None):

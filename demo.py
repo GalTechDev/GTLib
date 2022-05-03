@@ -33,9 +33,9 @@ class main_window:
         self.background = gt.Image(0,0,"Image/black.png")
         self.square = gt.Square(0,0,"blue",10,10)
         self.inputbox = gt.InputBox(10,10,200,30,default_text="Entrez du text")
-        self.boutton = gt.Boutton(10,100,gt.Square(0,0,"white",100,30),gt.Text(0,0,100,30,"Bonjour",hidden=True, color="black",font=pygame.font.Font(None,32)), color_hover="green", color_clic="blue")
+        self.boutton = gt.Bouton(10,100,gt.Square(0,0,"white",100,30),gt.Text(0,0,100,30,"Bonjour",hidden=True, color="black",font=pygame.font.Font(None,32)), color_hover="green", color_clic="blue")
         self.check = gt.Checkbox(300,10,30,color_rect="blue")
-        self.cursor = gt.Currsor(700,700,100,100,vertical=True,horizontal=False)
+        self.cursor = gt.Cursor(700,700,100,100,20,20,vertical=True,horizontal=True)
         self.all_sprites.add(self.background)
         self.all_sprites.add(self.boutton.square)
         self.all_sprites.add(self.check.square)
@@ -78,7 +78,8 @@ class main_window:
         self.inputbox.event(all_events)
         self.check.event(all_events)
         self.cursor.event(all_events)
-
+        if not self.cursor.clicked:
+            self.cursor.set_cursor(50,50)
         if all_events==[]:
             if self.menu_is_running:
                 #self.menu.event()
