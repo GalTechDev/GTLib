@@ -200,7 +200,7 @@ class Text():
 
 
 class Boutton(pygame.sprite.Sprite):
-    def __init__(self, x: int, y: int, square:Square, text:Text, color_hover=None, color_clic=None):
+    def __init__(self, x: int, y: int, square:Square, text: Text=None, color_hover=None, color_clic=None):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((square.size_x,square.size_y))
         self.rect = self.image.get_rect()
@@ -215,11 +215,22 @@ class Boutton(pygame.sprite.Sprite):
         self.square.rect.y+=y
 
         self.text = text
-        self.text.rect.x+=x
-        self.text.rect.y+=y
+        if not self.text==None:
+            self.text.rect.x+=x
+            self.text.rect.y+=y
 
         self.clicked = False
 
+    def moove_to(self,x,y):
+        dif_x = x-self.rect.x
+        dif_y = y-self.rect.y
+        self.rect.x = x
+        self.rect.y = y
+        self.square.rect.x+=dif_x
+        self.square.rect.y+=dif_y
+        if not self.text==None:
+            self.text.rect.x+=dif_x
+            self.text.rect.y+=dif_y
 
     def event(self, events):          
         for event in events:
@@ -237,7 +248,8 @@ class Boutton(pygame.sprite.Sprite):
 
 
     def draw(self, screen):
-        self.text.draw(screen)
+        if not self.text==None:
+            self.text.draw(screen)
         
 
 class Checkbox(pygame.sprite.Sprite):
@@ -268,7 +280,58 @@ class Checkbox(pygame.sprite.Sprite):
         if self.is_check:
             self.check.draw(screen)
         
+class Currsor(pygame.sprite.Sprite):
+    def __init__(self,x,y,size_x,size_y,vertical=False, horizontal=False):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((size_x,size_y))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
 
+        self.square = Square(self.rect.x+size_x//2-15,0,"blue",30,30)
+        self.val_x = 0
+        self.val_y = 0
+        self.vertical = vertical
+        self.horizontal = horizontal
+        self.clicked = False
 
+    def get_stat(self):
+        print(self.square.rect.y-self.rect.y, self.rect.h-self.square.rect.h)
+        print(self.val)
+        return [self.square.rect.y-self.rect.y, self.rect.h-self.square.rect.h]
 
+    def set_cursor(self,x=None,y=None):
+        if not x==None and self.horizontal:
+            self.square.rect.x = x/100*(self.rect.w-self.square.rect.w)+self.rect.x
+        if not y==None and self.vertical:
+            self.square.rect.y = y/100*(self.rect.h-self.square.rect.h)+self.rect.y
 
+    def event(self, events):
+        for event in events:
+            if event.type==pygame.MOUSEBUTTONUP:
+                self.clicked = False
+            if event.type==pygame.MOUSEBUTTONDOWN:
+                if self.rect.collidepoint(pygame.mouse.get_pos()):
+                    self.clicked = True
+        if self.clicked:
+            if self.vertical:
+                self.square.rect.y = pygame.mouse.get_pos()[1]
+            if self.horizontal:
+                self.square.rect.x = pygame.mouse.get_pos()[0]
+        if self.square.rect.y < self.rect.y:
+            self.square.rect.y = self.rect.y
+        elif self.square.rect.y > self.rect.y+self.rect.h-self.square.rect.h:
+            self.square.rect.y = self.rect.y+self.rect.h-self.square.rect.h
+
+        if self.square.rect.x < self.rect.x:
+            self.square.rect.x = self.rect.x
+        elif self.square.rect.x > self.rect.x+self.rect.w-self.square.rect.w:
+            self.square.rect.x = self.rect.x+self.rect.w-self.square.rect.w
+
+        self.val_y = ((self.square.rect.y-self.rect.y)/(self.rect.h-self.square.rect.h))*100
+        self.val_x = ((self.square.rect.x-self.rect.x)/(self.rect.w-self.square.rect.w))*100
+        
+
+    
+    def draw(self, screen):
+        pygame.draw.rect(screen, "white", self.rect, 2)
