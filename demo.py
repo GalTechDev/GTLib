@@ -36,6 +36,8 @@ class main_window:
         self.boutton = gt.Bouton(10,100,gt.Square(0,0,"white",100,30),gt.Text(0,0,100,30,"Bonjour",hidden=True, color="black",font=pygame.font.Font(None,32)), color_hover="green", color_clic="blue")
         self.check = gt.Checkbox(300,10,30,color_rect="blue")
         self.cursor = gt.Cursor(700,700,100,100,20,20,vertical=True,horizontal=True)
+        self.text = gt.Text(0,0,100,30,"test")
+        self.text.set_pos(y=200)
         self.all_sprites.add(self.background)
         self.all_sprites.add(self.boutton.square)
         self.all_sprites.add(self.check.square)
@@ -103,6 +105,7 @@ class main_window:
         self.boutton.draw(self.screen)
         self.check.draw(self.screen)
         self.cursor.draw(self.screen)
+        self.text.draw(self.screen)
         #if self.menu_is_running:
         #    self.menu.group_main_menu.draw(self.screen)
         pygame.display.flip()

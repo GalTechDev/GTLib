@@ -1,25 +1,27 @@
 from asyncore import write
+from hashlib import new
 import pygame
 import pyperclip
 import sys
 
 
 print("This Library need :\nimport pyperclip\nimport and init pygame before GTlib")
-try:
-    FONT = pygame.font.Font(None, 32)
-    COLOR_TEXT = pygame.Color('floralwhite')
-    COLOR_INACTIVE = pygame.Color('lightskyblue3')
-    COLOR_ACTIVE = pygame.Color('dodgerblue2')
-except:
+for i in range(2):
     try:
-        exec("import pygame")
-        exec("pygame.init()")
+        FONT = pygame.font.SysFont(None, 32)
+        COLOR_TEXT = pygame.Color('floralwhite')
+        COLOR_INACTIVE = pygame.Color('lightskyblue3')
+        COLOR_ACTIVE = pygame.Color('dodgerblue2')
     except:
-        print("pygame not detected, please install pygame")
-    try:
-        exec("import pyperclip")
-    except:
-        print("pyperclip not detected, please install pyperclip")
+        try:
+            exec("import pygame")
+            exec("pygame.init()")
+        except:
+            print("pygame not detected, please install pygame")
+        try:
+            exec("import pyperclip")
+        except:
+            print("pyperclip not detected, please install pyperclip")
 
         
             
@@ -32,11 +34,17 @@ def init(ref: int=0):
         ref=0
     base_code = dic[ref]
     path = sys.argv[0]
-    with open(base_code, 'r') as base:
-        with open(path, 'w') as file:
-            file.write(base.read())
-
-    print("Template Succesfuly applyed")
+    try:
+        with open(base_code, 'r') as base:
+            with open(path, 'w') as file:
+                file.write(base.read())
+        print("Template Succesfuly applyed")
+    except:
+        new_path=""
+        for ch in path.split("/")[:-1]:
+            new_path+=ch+"/"
+        path = new_path[:-1]
+        print(f"Template not found. Look for base_file.py on https://github.com/GalTechDev/GTLib and add it to {path}")
 
 
 class Square(pygame.sprite.Sprite):
@@ -52,8 +60,13 @@ class Square(pygame.sprite.Sprite):
         self.size_x = size_x
         self.size_y = size_y
 
+    def set_pos(self,x,y):
+        self.rect.x = x
+        self.rect.y = y
+
     def update(self):
         '''Update sprite : rect, size and color.'''
+        self.image = pygame.Surface((self.size_x,self.size_y))
         self.image.fill(pygame.Color(self.color))
 
     def __str__(self) -> str:
@@ -73,6 +86,12 @@ class Image(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+
+    def set_pos(self, x: int=None, y: int=None):
+        if not x==None:
+            self.rect.x = x
+        if not y==None:
+            self.rect.y = y
 
     def rescale(self,size_x,size_y):
         self.image = pygame.transform.scale(self.image, (size_x, size_y))
@@ -180,6 +199,8 @@ class Text():
     def __init__(self, x:int, y:int, w:int, h:int, text:str, data: str="", color: str="White", font=FONT, hidden: bool=False):
         '''A Text object: Need to call draw() intern fonction to work'''
         self.rect = pygame.Rect(x, y, w, h)
+        self.rect.x = x
+        self.rect.y = y
         self.color = color
         self.data = data
         self.text = text
@@ -187,9 +208,24 @@ class Text():
         self.txt_surface = self.font.render(self.text, True, self.color)
         self.hidden = hidden
 
+    def set_pos(self, x: int=None, y: int=None):
+        if not x==None:
+            self.rect.x = x
+        if not y==None:
+            self.rect.y = y
+
     def set_text(self, new_text: str):
         self.text = new_text
         self.txt_surface = self.font.render(self.text, True, self.color)
+
+    def set_data(self, new_data):
+        self.data = new_data
+
+    def get_text(self):
+        return self.text
+
+    def get_data(self):
+        return self.data
 
     def draw(self, screen):
         # Blit the text.
@@ -197,7 +233,6 @@ class Text():
         # Blit the rect.
         if not self.hidden:
             pygame.draw.rect(screen, self.color, self.rect, 2)
-
 
 class Bouton(pygame.sprite.Sprite):
     def __init__(self, x: int, y: int, square:Square, text: Text=None, color_hover=None, color_clic=None):
@@ -251,7 +286,6 @@ class Bouton(pygame.sprite.Sprite):
         if not self.text==None:
             self.text.draw(screen)
         
-
 class Checkbox(pygame.sprite.Sprite):
     def __init__(self, x: int, y: int, size: int, check_str: str="X",color_bg="white", color_rect="black", color_check="black", is_check: bool=False, check_str_size: int=None):
         pygame.sprite.Sprite.__init__(self)
