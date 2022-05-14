@@ -1,34 +1,37 @@
-from asyncore import write
-from hashlib import new
 import pygame
 import pyperclip
 import sys
+import PIL.Image
+import urllib.request
+import json
 
-
-print("This Library need :\nimport pyperclip\nimport and init pygame before GTlib")
-for i in range(2):
-    try:
-        FONT = pygame.font.SysFont(None, 32)
-        COLOR_TEXT = pygame.Color('floralwhite')
-        COLOR_INACTIVE = pygame.Color('lightskyblue3')
-        COLOR_ACTIVE = pygame.Color('dodgerblue2')
-    except:
-        try:
-            exec("import pygame")
-            exec("pygame.init()")
-        except:
-            print("pygame not detected, please install pygame")
-        try:
-            exec("import pyperclip")
-        except:
-            print("pyperclip not detected, please install pyperclip")
-
+class MissingImport(Exception):
+    pass
         
-            
+def is_import(module: str=None,modules: list=[]):
+    for mod in modules:
+        if not mod in sys.modules:
+            raise MissingImport(f"{mod} not imported")
+    if not module==None:
+        if not module in sys.modules:
+            raise MissingImport(f"{module} not imported")
+
+
+try:
+    FONT = pygame.font.SysFont(None, 32)
+    COLOR_TEXT = pygame.Color('floralwhite')
+    COLOR_INACTIVE = pygame.Color('lightskyblue3')
+    COLOR_ACTIVE = pygame.Color('dodgerblue2')
+except:
+    is_import(modules=["pygame","pyperclip"])
+
+
+
 
 
 def init(ref: int=0):
     '''Convert active file to a ready to code file for pygame dev'''
+    is_import(module="sys")
     dic={0:"base_file.py"}
     if ref not in dic.keys():
         ref=0
@@ -48,17 +51,22 @@ def init(ref: int=0):
 
 
 class Square(pygame.sprite.Sprite):
-    def __init__(self, x:int, y:int, color, size_x:int, size_y:int):
+    def __init__(self, x:int, y:int, color, size_x:int, size_y:int, alpha: int=255):
         '''Make a simple square that include some methode.'''
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.Surface((size_x,size_y))
         self.image.fill(pygame.Color(color))
+        self.image.set_alpha(alpha)
         self.color = color
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
         self.size_x = size_x
         self.size_y = size_y
+
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
 
     def set_pos(self,x,y):
         self.rect.x = x
@@ -75,7 +83,6 @@ class Square(pygame.sprite.Sprite):
     def get_dic(self) -> dict:
         '''Return a dic with square information. Can be use to make json file.'''
         return {"x":self.rect.x,"y":self.rect.y,"color":self.color,"size_x":self.size_x,"size_y":self.size_y}
-
 
 class Image(pygame.sprite.Sprite):
     def __init__(self, x:int, y:int, ref:str):
@@ -96,7 +103,6 @@ class Image(pygame.sprite.Sprite):
     def rescale(self,size_x,size_y):
         self.image = pygame.transform.scale(self.image, (size_x, size_y))
         self.rect = self.image.get_rect()
-
 
 class InputBox(pygame.sprite.Sprite):
     def __init__(self, x:int, y:int, size_x:int, size_y:int,text: str='', inactive_color=COLOR_INACTIVE, active_color=COLOR_ACTIVE,font=FONT, min_char: int=0 ,max_char: int=None, default_text: str="", autolock: bool=False, continute_intup: bool=False):
@@ -194,7 +200,6 @@ class InputBox(pygame.sprite.Sprite):
         # Blit the rect.
         pygame.draw.rect(screen, self.color, self.rect, 2)
 
-
 class Text():
     def __init__(self, x:int, y:int, w:int, h:int, text:str, data: str="", color: str="White", font=FONT, hidden: bool=False):
         '''A Text object: Need to call draw() intern fonction to work'''
@@ -283,6 +288,7 @@ class Bouton(pygame.sprite.Sprite):
 
 
     def draw(self, screen):
+        self.square.draw(screen)
         if not self.text==None:
             self.text.draw(screen)
         
@@ -310,6 +316,7 @@ class Checkbox(pygame.sprite.Sprite):
                     self.is_check = not self.is_check
 
     def draw(self, screen):
+        self.square.draw(screen)
         pygame.draw.rect(screen, self.color_rect, self.rect, 2)
         if self.is_check:
             self.check.draw(screen)
@@ -368,4 +375,61 @@ class Cursor(pygame.sprite.Sprite):
 
     
     def draw(self, screen):
+        self.square.draw(screen)
         pygame.draw.rect(screen, "white", self.rect, 2)
+
+class Gobject():
+    def __init__(self,x,y,pixels: dict={}):
+        """pixels a dict object build as : {"x,y":[r,g,b,a]}. imgtogobj() return the good object"""
+        self.x=x
+        self.y=y
+        self.pixels=pixels
+        self.pixel_size=1
+        self.image = []
+        for pixel in self.pixels.keys():
+            self.image.append(Square(pixel[0]+self.x+self.pixel_size-1,pixel[1]+self.y+self.pixel_size-1,(self.pixels[pixel][:-1]),self.pixel_size,self.pixel_size,self.pixels[pixel][-1]))
+
+    def set_pos(self,pos:tuple):
+        self.dif_x = pos[0]-self.x
+        self.dif_y = pos[1]-self.y
+        for pixel in self.image:
+            pixel.set_pos(pixel.rect.x+self.dif_x,pixel.rect.y+self.dif_y)
+        self.x = pos[0]
+        self.y = pos[1]
+
+    def gen(self,data):
+        """data a dict object build as : {"x,y":[r,g,b,a]}"""
+        for pixel in data.keys():
+            pixel = pixel.split(",")
+            pixel = [int(coo) for coo in pixel]
+            self.image.append(Square(pixel[0]+self.x+self.pixel_size-1,pixel[1]+self.y+self.pixel_size-1,(data[f"{pixel[0]},{pixel[1]}"][:-1]),self.pixel_size,self.pixel_size,data[f"{pixel[0]},{pixel[1]}"][-1]))
+
+    def load(self,path):
+        with open(path) as json_file:
+            data = json.load(json_file)
+        print(data)
+        self.gen(data)
+
+    def draw(self,screen):
+        for pixel in self.image:
+            pixel.draw(screen)
+
+def imgtogobj(image: PIL.Image=None, path=None, url=None):
+    '''This fonction is using PIL library, image must be a PIL.Image object, url and path must point to .png file.'''
+    if image is None:
+        if path is None:
+            if url is None:
+                return
+            else:
+                urllib.request.urlretrieve(url,"temp_image.png")
+                image = PIL.Image.open("temp_image.png")
+        else:
+            image = PIL.Image.open(path)
+    img = image.convert('RGBA')
+    size = img.size
+    pixels={}
+    for x in range(size[0]):
+        for y in range(size[1]):
+            r, g, b, a = img.getpixel((x, y))
+            pixels.update({f"{x},{y}":[r,g,b,a]})
+    return pixels

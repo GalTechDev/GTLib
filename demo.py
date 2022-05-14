@@ -31,7 +31,7 @@ class main_window:
 
         # OBJECTS
         self.background = gt.Image(0,0,"Image/black.png")
-        self.square = gt.Square(0,0,"blue",10,10)
+        self.square = gt.Square(0,0,"blue",1,1)
         self.inputbox = gt.InputBox(10,10,200,30,default_text="Entrez du text")
         self.boutton = gt.Bouton(10,100,gt.Square(0,0,"white",100,30),gt.Text(0,0,100,30,"Bonjour",hidden=True, color="black",font=pygame.font.Font(None,32)), color_hover="green", color_clic="blue")
         self.check = gt.Checkbox(300,10,30,color_rect="blue")
@@ -39,10 +39,9 @@ class main_window:
         self.text = gt.Text(0,0,100,30,"test")
         self.text.set_pos(y=200)
         self.all_sprites.add(self.background)
-        self.all_sprites.add(self.boutton.square)
-        self.all_sprites.add(self.check.square)
-        self.all_sprites.add(self.square)
-        self.all_sprites.add(self.cursor.square)
+        self.card = gt.Gobject(0,0)
+        self.card.load("C:/Users/Maxence/Pictures/test.gobj")
+        
         
 
         # Call
@@ -82,6 +81,7 @@ class main_window:
         self.cursor.event(all_events)
         if not self.cursor.clicked:
             self.cursor.set_cursor(50,50)
+            self.card.set_pos(pygame.mouse.get_pos())
         if all_events==[]:
             if self.menu_is_running:
                 #self.menu.event()
@@ -101,6 +101,8 @@ class main_window:
 
     def draw(self):
         self.all_sprites.draw(self.screen) # actualise les sprites
+        self.card.draw(self.screen)
+        self.square.draw(self.screen)
         self.inputbox.draw(self.screen)
         self.boutton.draw(self.screen)
         self.check.draw(self.screen)
