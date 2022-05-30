@@ -379,23 +379,28 @@ class Cursor(pygame.sprite.Sprite):
         pygame.draw.rect(screen, "white", self.rect, 2)
 
 class Gobject():
-    def __init__(self,x,y,pixels: dict={},size=1):
+    def __init__(self,x,y,pixels: dict={},size=1, angle=0):
         """pixels a dict object build as : {"x,y":[r,g,b,a]}. imgtogobj() return the good object"""
-        self.x=x
-        self.y=y
+        self.rotated_surface=pygame.Surface((10,10))
+        self.surface=pygame.Surface((10,10))
+        self.rect=self.surface.get_rect()
+        self.rect.x=x
+        self.rect.y=y
+        self.angle=angle
         self.pixels=pixels
         self.pixel_size=size
         self.image = []
-        for pixel in self.pixels.keys():
-            self.image.append(Square(pixel[0]*self.pixel_size+self.x,pixel[1]*self.pixel_size+self.y,(self.pixels[pixel][:-1]),self.pixel_size,self.pixel_size,self.pixels[pixel][-1]))
+        if pixels!={}:
+            self.gen(pixels)
 
     def set_pos(self,pos:tuple):
-        self.dif_x = pos[0]-self.x
-        self.dif_y = pos[1]-self.y
-        for pixel in self.image:
-            pixel.set_pos(pixel.rect.x+self.dif_x,pixel.rect.y+self.dif_y)
-        self.x = pos[0]
-        self.y = pos[1]
+        self.rect.x = pos[0]
+        self.rect.y = pos[1]
+
+    def set_rotation(self,angle):
+        self.angle = -angle
+        self.rotated_surface=pygame.transform.rotate(self.surface,self.angle)
+        print(self.angle)
 
     def set_size(self,new_size):
         self.pixel_size = new_size
@@ -404,10 +409,12 @@ class Gobject():
     def gen(self,data):
         """data a dict object build as : {"x,y":[r,g,b,a]}"""
         self.pixels=data
+        self.surface=pygame.Surface(((max([int(pixel.split(",")[0]) for pixel in data.keys()])-min([int(pixel.split(",")[0]) for pixel in data.keys()])),max([int(pixel.split(",")[1]) for pixel in data.keys()])-min([int(pixel.split(",")[1]) for pixel in data.keys()])))
         for pixel in data.keys():
             pixel = pixel.split(",")
             pixel = [int(coo) for coo in pixel]
-            self.image.append(Square(pixel[0]*self.pixel_size+self.x,pixel[1]*self.pixel_size+self.y,(data[f"{pixel[0]},{pixel[1]}"][:-1]),self.pixel_size,self.pixel_size,data[f"{pixel[0]},{pixel[1]}"][-1]))
+            self.image.append(Square(pixel[0]*self.pixel_size+self.rect.x,pixel[1]*self.pixel_size+self.rect.y,(data[f"{pixel[0]},{pixel[1]}"][:-1]),self.pixel_size,self.pixel_size,data[f"{pixel[0]},{pixel[1]}"][-1]))
+        self.set_rotation(-self.angle)
 
     def load(self,path):
         with open(path) as json_file:
@@ -428,9 +435,13 @@ class Gobject():
         return False
 
     def draw(self,screen):
-        for pixel in self.image:
-            pixel.draw(screen)
 
+        for pixel in self.image:
+            pixel.draw(self.surface)
+        self.set_rotation(-self.angle)
+        #screen.blit(self.surface, self.rect)
+        screen.blit(self.rotated_surface, self.rect)
+        
 def imgtogobj(image: PIL.Image=None, path=None, url=None):
     '''This fonction is using PIL library, image must be a PIL.Image object, url and path must point to .png file.'''
     if image is None:

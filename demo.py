@@ -82,6 +82,7 @@ class main_window:
         if not self.cursor.clicked:
             self.cursor.set_cursor(50,50)
             self.card.set_pos(pygame.mouse.get_pos())
+            self.card.set_rotation(10)
         if all_events==[]:
             if self.menu_is_running:
                 #self.menu.event()
