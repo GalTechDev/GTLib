@@ -40,7 +40,7 @@ class main_window:
         self.text.set_pos(y=200)
         self.all_sprites.add(self.background)
         self.card = gt.Gobject(0,0)
-        self.card.load("C:/Users/Maxence/Pictures/test.gobj")
+        self.card.gen(gt.imgtogobj(url="https://i.ibb.co/1KTYtsg/passe-ton-tourvert.png"))
         
         
 

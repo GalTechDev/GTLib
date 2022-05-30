@@ -379,15 +379,15 @@ class Cursor(pygame.sprite.Sprite):
         pygame.draw.rect(screen, "white", self.rect, 2)
 
 class Gobject():
-    def __init__(self,x,y,pixels: dict={}):
+    def __init__(self,x,y,pixels: dict={},size=1):
         """pixels a dict object build as : {"x,y":[r,g,b,a]}. imgtogobj() return the good object"""
         self.x=x
         self.y=y
         self.pixels=pixels
-        self.pixel_size=1
+        self.pixel_size=size
         self.image = []
         for pixel in self.pixels.keys():
-            self.image.append(Square(pixel[0]+self.x+self.pixel_size-1,pixel[1]+self.y+self.pixel_size-1,(self.pixels[pixel][:-1]),self.pixel_size,self.pixel_size,self.pixels[pixel][-1]))
+            self.image.append(Square(pixel[0]*self.pixel_size+self.x,pixel[1]*self.pixel_size+self.y,(self.pixels[pixel][:-1]),self.pixel_size,self.pixel_size,self.pixels[pixel][-1]))
 
     def set_pos(self,pos:tuple):
         self.dif_x = pos[0]-self.x
@@ -397,18 +397,35 @@ class Gobject():
         self.x = pos[0]
         self.y = pos[1]
 
+    def set_size(self,new_size):
+        self.pixel_size = new_size
+        self.gen(self.pixels)
+
     def gen(self,data):
         """data a dict object build as : {"x,y":[r,g,b,a]}"""
+        self.pixels=data
         for pixel in data.keys():
             pixel = pixel.split(",")
             pixel = [int(coo) for coo in pixel]
-            self.image.append(Square(pixel[0]+self.x+self.pixel_size-1,pixel[1]+self.y+self.pixel_size-1,(data[f"{pixel[0]},{pixel[1]}"][:-1]),self.pixel_size,self.pixel_size,data[f"{pixel[0]},{pixel[1]}"][-1]))
+            self.image.append(Square(pixel[0]*self.pixel_size+self.x,pixel[1]*self.pixel_size+self.y,(data[f"{pixel[0]},{pixel[1]}"][:-1]),self.pixel_size,self.pixel_size,data[f"{pixel[0]},{pixel[1]}"][-1]))
 
     def load(self,path):
         with open(path) as json_file:
             data = json.load(json_file)
         print(data)
         self.gen(data)
+
+    def colliderect(self,sprite: pygame.sprite):
+        for pixel in self.image:
+            if pygame.sprite.collide_rect(pixel,sprite):
+                return True
+        return False
+
+    def collidepoint(self, point: tuple | list):
+        for pixel in self.image:
+            if pixel.rect.collidepoint(point):
+                return True
+        return False
 
     def draw(self,screen):
         for pixel in self.image:
@@ -421,8 +438,8 @@ def imgtogobj(image: PIL.Image=None, path=None, url=None):
             if url is None:
                 return
             else:
-                urllib.request.urlretrieve(url,"temp_image.png")
-                image = PIL.Image.open("temp_image.png")
+                urllib.request.urlretrieve(url,"tmp/temp_image.png")
+                image = PIL.Image.open("tmp/temp_image.png")
         else:
             image = PIL.Image.open(path)
     img = image.convert('RGBA')
