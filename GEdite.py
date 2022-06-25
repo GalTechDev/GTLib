@@ -1,11 +1,12 @@
 import pygame
 pygame.init()
+import threading
 import GTlib as gt
 
 #----------------- Global constante ---------------
 
 SCREEN = (800,800)
-gt.SCREEN = SCREEN
+TOOLSCREEN = (300,800)
 FPS = 60
 
 #---------------------- Class ---------------------
@@ -17,8 +18,7 @@ class main_window:
     def __init__(self):
         # PARAMETER
         pygame.display.set_caption("title here")
-        self.window = pygame.display.set_mode(SCREEN,pygame.RESIZABLE) #pygame.FULLSCREEN
-        self.screen = pygame.Surface(SCREEN)
+        self.screen = pygame.display.set_mode(SCREEN) #pygame.FULLSCREEN
         self.clock = pygame.time.Clock()
 
         # NETWORK
@@ -33,18 +33,7 @@ class main_window:
 
         # OBJECTS
         self.background = gt.Image(0,0,"Image/black.png")
-        self.square = gt.Square(0,0,"blue",1,1)
-        self.inputbox = gt.InputBox(10,10,200,30,default_text="Entrez du text")
-        self.boutton = gt.Bouton(10,100,gt.Square(0,0,"white",100,30),gt.Text(0,0,100,30,"Bonjour",hidden=True, color="black",font=pygame.font.Font(None,32)), color_hover="green", color_clic="blue")
-        self.check = gt.Checkbox(300,10,30,color_rect="blue")
-        self.cursor = gt.Cursor(700,700,100,100,20,20,vertical=True,horizontal=True)
-        self.text = gt.Text(0,0,100,30,"test")
-        self.text.set_pos(y=200)
         self.all_sprites.add(self.background)
-        self.card = gt.Gobject(0,0)
-        self.card.gen(gt.imgtogobj(url="https://i.ibb.co/1KTYtsg/passe-ton-tourvert.png"))
-        
-        
 
         # Call
         self.call_menu()
@@ -75,16 +64,8 @@ class main_window:
 
     
     def events(self):
+        
         all_events = pygame.event.get()
-        self.square.rect = gt.relative_mouse_pos(SCREEN)
-        self.boutton.event(all_events)
-        self.inputbox.event(all_events)
-        self.check.event(all_events)
-        self.cursor.event(all_events)
-        if not self.cursor.clicked:
-            self.cursor.set_cursor(50,50)
-            self.card.set_pos(gt.relative_mouse_pos(SCREEN))
-            self.card.set_rotation(10)
         if all_events==[]:
             if self.menu_is_running:
                 #self.menu.event()
@@ -96,27 +77,16 @@ class main_window:
                 None
 
             for event in all_events:
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        self.cursor.set_cursor(y=100)
-                        
+
                 if event.type == pygame.QUIT:
                     pygame.quit()
 
     def draw(self):
         self.all_sprites.draw(self.screen) # actualise les sprites
-        self.card.draw(self.screen)
-        self.square.draw(self.screen)
-        self.inputbox.draw(self.screen)
-        self.boutton.draw(self.screen)
-        self.check.draw(self.screen)
-        self.cursor.draw(self.screen)
-        self.text.draw(self.screen)
+
         #if self.menu_is_running:
         #    self.menu.group_main_menu.draw(self.screen)
-        self.window.blit(pygame.transform.scale(self.screen,pygame.display.get_window_size()),(0,0))
         pygame.display.flip()
-    
 
 test_mode=True
 if __name__ == '__main__':

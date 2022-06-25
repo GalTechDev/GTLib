@@ -16,8 +16,8 @@ def is_import(module: str=None,modules: list=[]):
         if not module in sys.modules:
             raise MissingImport(f"{module} not imported")
 
-
 try:
+    pygame.init()
     FONT = pygame.font.SysFont(None, 32)
     COLOR_TEXT = pygame.Color('floralwhite')
     COLOR_INACTIVE = pygame.Color('lightskyblue3')
@@ -25,7 +25,7 @@ try:
 except:
     is_import(modules=["pygame","pyperclip"])
 
-
+SCREEN = None
 
 
 
@@ -143,7 +143,7 @@ class InputBox(pygame.sprite.Sprite):
 
         for event in events:
             if event.type == pygame.MOUSEBUTTONUP:
-                if self.rect.collidepoint(pygame.mouse.get_pos()):
+                if self.rect.collidepoint(relative_mouse_pos(SCREEN)):
                     self.active = not self.active
                 else:
                     self.active = False
@@ -277,11 +277,11 @@ class Bouton(pygame.sprite.Sprite):
             if event.type==pygame.MOUSEBUTTONUP:
                 self.clicked = False
             if event.type==pygame.MOUSEBUTTONDOWN:
-                if self.rect.collidepoint(pygame.mouse.get_pos()):
+                if self.rect.collidepoint(relative_mouse_pos(SCREEN)):
                     self.clicked = True
         if self.clicked:
             self.square.color = self.square_color_c if not self.square_color_c is None else self.square_color_n
-        elif self.rect.collidepoint(pygame.mouse.get_pos()):
+        elif self.rect.collidepoint(relative_mouse_pos(SCREEN)):
             self.square.color = self.square_color_h if not self.square_color_h is None else self.square_color_n
         else:
             self.square.color = self.square_color_n
@@ -312,7 +312,7 @@ class Checkbox(pygame.sprite.Sprite):
     def event(self, events):
         for event in events:
             if event.type==pygame.MOUSEBUTTONUP:
-                if self.rect.collidepoint(pygame.mouse.get_pos()):
+                if self.rect.collidepoint(relative_mouse_pos(SCREEN)):
                     self.is_check = not self.is_check
 
     def draw(self, screen):
@@ -352,13 +352,13 @@ class Cursor(pygame.sprite.Sprite):
             if event.type==pygame.MOUSEBUTTONUP:
                 self.clicked = False
             if event.type==pygame.MOUSEBUTTONDOWN:
-                if self.rect.collidepoint(pygame.mouse.get_pos()):
+                if self.rect.collidepoint(relative_mouse_pos(SCREEN)):
                     self.clicked = True
         if self.clicked:
             if self.vertical:
-                self.square.rect.y = pygame.mouse.get_pos()[1]
+                self.square.rect.y = relative_mouse_pos(SCREEN)[1]
             if self.horizontal:
-                self.square.rect.x = pygame.mouse.get_pos()[0]
+                self.square.rect.x = relative_mouse_pos(SCREEN)[0]
         if self.square.rect.y < self.rect.y:
             self.square.rect.y = self.rect.y
         elif self.square.rect.y > self.rect.y+self.rect.h-self.square.rect.h:
@@ -400,7 +400,6 @@ class Gobject():
     def set_rotation(self,angle):
         self.angle = -angle
         self.rotated_surface=pygame.transform.rotate(self.surface,self.angle)
-        print(self.angle)
 
     def set_size(self,new_size):
         self.pixel_size = new_size
@@ -461,3 +460,9 @@ def imgtogobj(image: PIL.Image=None, path=None, url=None):
             r, g, b, a = img.getpixel((x, y))
             pixels.update({f"{x},{y}":[r,g,b,a]})
     return pixels
+
+def relative_mouse_pos(surface_size):
+    final_size = pygame.display.get_window_size()
+    original_size = surface_size
+    absolut_size = pygame.mouse.get_pos()
+    return ((int(original_size[0]/final_size[0]*absolut_size[0]),int(original_size[1]/final_size[1]*absolut_size[1])))
