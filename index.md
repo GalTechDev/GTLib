@@ -1,6 +1,6 @@
 ## Welcome to GTlib GitHub Pages
 
-You can check avencement here : [Feature list](https://github.com/GalTechDev/GTLib/edit/gh-pages/index.md) to watch road map.
+You can check avencement here : [Feature list](https://github.com/GalTechDev/GTLib/projects/1) to watch road map.
 
 You can download the project here : [Download](https://github.com/GalTechDev/GTLib/archive/refs/heads/main.zip).
 
