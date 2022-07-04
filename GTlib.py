@@ -175,6 +175,7 @@ class Image(pygame.sprite.Sprite, Sprite):
         pos=(self.rect.x,self.rect.y)
         self.surface = pygame.image.load(self.path)
         self.set_pos(pos)
+        self.set_size(self.surface.get_size())
 
     def set_size(self, size: tuple[int, int]):
         self.size = size
@@ -418,8 +419,8 @@ class Cursor(pygame.sprite.Sprite):
         self.clicked = False
 
     def get_stat(self):
-        print(self.square.rect.y-self.rect.y, self.rect.h-self.square.rect.h)
-        print(self.val_x, self.val_y)
+        #print(self.square.rect.y-self.rect.y, self.rect.h-self.square.rect.h)
+        #print(self.val_x, self.val_y)
         return [self.square.rect.y-self.rect.y, self.rect.h-self.square.rect.h]
 
     def set_cursor(self,x=None,y=None):

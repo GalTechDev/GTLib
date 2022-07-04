@@ -18,9 +18,10 @@ class main_window:
         # PARAMETER
         pygame.display.set_caption("title here")
         self.screen = pygame.Surface(SCREEN)
-        self.window = pygame.display.set_mode(SCREEN) #pygame.FULLSCREEN
+        self.window = pygame.display.set_mode(SCREEN, pygame.RESIZABLE) #pygame.FULLSCREEN
         self.clock = pygame.time.Clock()
-
+        self.keep_screen_proportion = True
+        self.keep_win_proportion = True
         # NETWORK
 
         # GROUPS
@@ -34,8 +35,8 @@ class main_window:
         # OBJECTS
         self.background = gt.Image((0,0),"Image/black.png")
         self.input = gt.InputBox((0,0),(100,30), text="test")
-        self.all_sprites.add(self.background)
         self.all_sprites.add(self.input)
+        self.all_sprites.add(self.background)
 
         # Call
         self.call_menu()
@@ -87,10 +88,18 @@ class main_window:
 
     def draw(self):
         self.all_sprites.draw(self.screen)
-
+        self.background.draw(self.screen)
         #if self.menu_is_running:
         #    self.menu.group_main_menu.draw(self.screen)
-        self.window.blit(pygame.transform.scale(self.screen,pygame.display.get_window_size()),(0,0))
+        if self.keep_screen_proportion:
+            win_size=pygame.display.get_window_size() #800x800 1000x900 1000-800 900-800 200 100
+            dif=min(win_size[0]-SCREEN[0],win_size[1]-SCREEN[1])
+            win_size=(SCREEN[0]+dif,SCREEN[1]+dif)
+            self.window.blit(pygame.transform.scale(self.screen,win_size),(0,0))
+            if self.keep_win_proportion and not pygame.display.get_window_size()==win_size:
+                pygame.display.set_mode(win_size, pygame.RESIZABLE)
+        else:
+            self.window.blit(pygame.transform.scale(self.screen,pygame.display.get_window_size()),(0,0))
         pygame.display.flip()
 
 
