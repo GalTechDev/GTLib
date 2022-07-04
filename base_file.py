@@ -5,6 +5,7 @@ import GTlib as gt
 #----------------- Global constante ---------------
 
 SCREEN = (800,800)
+gt.SCREEN = SCREEN
 FPS = 60
 
 #---------------------- Class ---------------------

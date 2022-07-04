@@ -183,22 +183,17 @@ class Image(pygame.sprite.Sprite, Sprite):
         self.blit(screen, pygame.transform.scale(self.surface, self.size))
 
 class InputBox(pygame.sprite.Sprite, Sprite):
-    def __init__(self, x:int, y:int, size_x:int, size_y:int,text: str='', inactive_color=COLOR_INACTIVE, active_color=COLOR_ACTIVE,font=FONT, min_char: int=0 ,max_char: int=None, default_text: str="", autolock: bool=False, continute_intup: bool=False):
-        '''An input box object: Need intern event() and draw() fonction call to work correctly'''
+    def __init__(self, position: tuple[int,int], size: tuple[int,int]=(0,0), rotation: float=0, alpha: int=255, text: str='', inactive_color=COLOR_INACTIVE, active_color=COLOR_ACTIVE,font=FONT, min_char: int=0 ,max_char: int=None, default_text: str="", autolock: bool=False, continute_intup: bool=False):
+        '''An input box object: Need event() and draw() fonction call to work correctly'''
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((size_x,size_y))
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-        self.size_x = size_x
-        self.size_y = size_y
+        Sprite.__init__(self,position,size,rotation,alpha)
+        
         self.active = False
-
         self.inactive_color = inactive_color
         self.active_color = active_color
         self.color = inactive_color
         self.default_text = default_text
-        self.text = Text(self.rect.x, self.rect.y, self.size_x,self.size_y, text, hidden=True)
+        self.text = Text(self.rect.x, self.rect.y, size[0],size[1], text, hidden=True)
         self.text.font = font
 
         self.autolock = autolock
@@ -265,8 +260,10 @@ class InputBox(pygame.sprite.Sprite, Sprite):
     def update(self):
         '''Internal fonction, please don't use it.'''
         # Resize the box if the text is too long.
-        width = max(self.size_x, self.text.txt_surface.get_width()+10)
-        self.rect.width = width
+        width = max(self.surface.get_size()[0], self.text.txt_surface.get_width()+10)
+        self.set_size((width,self.get_size()[1]))
+        pos = self.get_pos()
+        self.set_pos(pos)
 
     def get(self) -> str:
         '''Return entered text.'''
@@ -274,9 +271,15 @@ class InputBox(pygame.sprite.Sprite, Sprite):
 
     def draw(self, screen):
         # Blit the text.
-        self.text.draw(screen)
-        # Blit the rect.
-        pygame.draw.rect(screen, self.color, self.rect, 2)
+        new_surface = self.surface.copy()
+        self.text.draw(new_surface)
+        pygame.draw.rect(new_surface, self.color, self.rect, 2)
+        new_surface = pygame.transform.rotate(new_surface,self.angle)
+        new_surface.set_alpha(self.alpha)
+        screen.blit(new_surface, self.rect)
+
+        
+        
 
 class Text():
     def __init__(self, x:int, y:int, w:int, h:int, text:str, data: str="", color: str="White", font=FONT, hidden: bool=False):
