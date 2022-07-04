@@ -1,3 +1,4 @@
+from re import X
 import pygame
 import pyperclip
 import sys
@@ -49,62 +50,139 @@ def init(ref: int=0):
         path = new_path[:-1]
         print(f"Template not found. Look for base_file.py on https://github.com/GalTechDev/GTLib and add it to {path}")
 
+class Sprite:
 
-class Square(pygame.sprite.Sprite):
-    def __init__(self, x:int, y:int, color, size_x:int, size_y:int, alpha: int=255):
-        '''Make a simple square that include some methode.'''
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((size_x,size_y))
-        self.image.fill(pygame.Color(color))
-        self.image.set_alpha(alpha)
-        self.color = color
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-        self.size_x = size_x
-        self.size_y = size_y
+    def __init__(self, position: tuple[int,int], size: tuple[int,int], rotation: float=0, alpha: int=255):
+        self.set_surface(size,position)
+        self.set_rotation(rotation) 
+        self.set_alpha(alpha)
 
+    def set_surface(self, size: tuple[int,int], position: tuple[int,int]=(0,0)):
+        self.set_size(size)
+        self.set_pos(position)
 
-    def draw(self, screen):
-        screen.blit(self.image, self.rect)
+    def set_rotation(self, angle: float):
+        self.angle = angle
 
-    def set_pos(self,x,y):
-        self.rect.x = x
-        self.rect.y = y
+    def get_rotation(self):
+        return self.angle
+
+    def set_pos(self, position: tuple[int,int]):
+        self.rect = self.surface.get_rect()
+        self.rect.x = position[0]
+        self.rect.y = position[1]
+
+    def get_pos(self):
+        return (self.rect.x,self.rect.y)
+
+    def set_alpha(self, alpha: int):
+        self.alpha = alpha
+    
+    def get_alpha(self):
+        return self.alpha
+
+    def set_size(self, size: tuple[int,int]):
+        self.surface = pygame.Surface((size[0],size[1]))
+
+    def get_size(self):
+        return self.surface.get_size()
+
+    def blit(self, screen:pygame.Surface, surface:pygame.Surface):
+        new_surface = pygame.transform.rotate(surface,self.angle)
+        new_surface.set_alpha(self.alpha)
+        screen.blit(new_surface, self.rect)
 
     def update(self):
-        '''Update sprite : rect, size and color.'''
-        self.image = pygame.Surface((self.size_x,self.size_y))
-        self.image.fill(pygame.Color(self.color))
+        pass
 
-    def __str__(self) -> str:
-        return f"Info of {self}:\nx: {self.rect.x} y: {self.rect.y}\nsize_x: {self.size_x} size_y: {self.size_y}\ncolor: {self.color}"
+    def event(self, events):
+        pass
+
+class Group:
+    def __init__(self):
+        self.all_sprite = []
+    
+    def add(self, sprite):
+        if not sprite in self.all_sprite:
+            self.all_sprite.append(sprite)
+
+    def remove(self, sprite):
+        if sprite in self.all_sprite:
+            self.all_sprite.remove(sprite)
+
+    def pop(self, index=0):
+        if index>=0 and index<len(self.all_sprite):
+            self.all_sprite.pop(index)
+
+    def has(self, sprite):
+        return sprite in self.all_sprite
+
+    def event(self, events):
+        for sprite in self.all_sprite:
+            sprite.event(events)
+
+    def update(self):
+        for sprite in self.all_sprite:
+            sprite.update()
+
+    def draw(self, screen):
+        for sprite in self.all_sprite:
+            sprite.draw(screen)
+
+    def ev_up_dr(self, events, screen):
+        for sprite in self.all_sprite:
+            sprite.event(events)
+            sprite.update()
+            sprite.draw(screen)
+    
+
+class Square(pygame.sprite.Sprite, Sprite):
+    def __init__(self, position: tuple[int,int], color, size: tuple[int,int], rotation: float=0, alpha: int=255):
+        '''Make a simple square that include some methode.'''
+        pygame.sprite.Sprite.__init__(self)
+        Sprite.__init__(self,position,size,rotation,alpha)
+
+        self.set_color(color)
+
+    def set_color(self,color):
+        self.color = color
+        self.surface.fill(pygame.Color(self.color))
+
+    def draw(self, screen):
+        self.blit(screen, self.surface)
 
     def get_dic(self) -> dict:
         '''Return a dic with square information. Can be use to make json file.'''
         return {"x":self.rect.x,"y":self.rect.y,"color":self.color,"size_x":self.size_x,"size_y":self.size_y}
 
-class Image(pygame.sprite.Sprite):
-    def __init__(self, x:int, y:int, ref:str):
-        '''Simple way to manage image and rect'''
+    def __str__(self) -> str:
+        return f"Info of {self}:\nx: {self.rect.x} y: {self.rect.y}\nsize_x: {self.get_size()[0]} size_y: {self.get_size()[1]}\ncolor: {self.color}"
+
+class Image(pygame.sprite.Sprite, Sprite):
+    def __init__(self, position: tuple[int,int], path: str, size: tuple[int,int]=(0,0), rotation: float=0, alpha: int=255):
+        '''Simple way to manage image'''
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(ref)
-        self.ref = ref
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        self.surface = pygame.Surface((size[0],size[1]))
+        Sprite.__init__(self,position,size,rotation,alpha)
+        self.set_size(size)
+        self.set_path(path)
+        self.load_image()
 
-    def set_pos(self, x: int=None, y: int=None):
-        if not x==None:
-            self.rect.x = x
-        if not y==None:
-            self.rect.y = y
+    def set_path(self, path):
+        self.path = path
 
-    def rescale(self,size_x,size_y):
-        self.image = pygame.transform.scale(self.image, (size_x, size_y))
-        self.rect = self.image.get_rect()
+    def load_image(self):
+        pos=(self.rect.x,self.rect.y)
+        self.surface = pygame.image.load(self.path)
+        self.set_pos(pos)
 
-class InputBox(pygame.sprite.Sprite):
+    def set_size(self, size: tuple[int, int]):
+        self.size = size
+
+    def draw(self, screen):
+        self.blit(screen, pygame.transform.scale(self.surface, self.size))
+
+class InputBox(pygame.sprite.Sprite, Sprite):
     def __init__(self, x:int, y:int, size_x:int, size_y:int,text: str='', inactive_color=COLOR_INACTIVE, active_color=COLOR_ACTIVE,font=FONT, min_char: int=0 ,max_char: int=None, default_text: str="", autolock: bool=False, continute_intup: bool=False):
         '''An input box object: Need intern event() and draw() fonction call to work correctly'''
         pygame.sprite.Sprite.__init__(self)
@@ -464,5 +542,7 @@ def imgtogobj(image: PIL.Image=None, path=None, url=None):
 def relative_mouse_pos(surface_size):
     final_size = pygame.display.get_window_size()
     original_size = surface_size
-    absolut_size = pygame.mouse.get_pos()
-    return ((int(original_size[0]/final_size[0]*absolut_size[0]),int(original_size[1]/final_size[1]*absolut_size[1])))
+    absolut_pos = pygame.mouse.get_pos()
+    relative_pos = ((int(original_size[0]/final_size[0]*absolut_pos[0]),int(original_size[1]/final_size[1]*absolut_pos[1])))
+    print(relative_pos)
+    return(relative_pos)
