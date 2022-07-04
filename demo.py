@@ -35,8 +35,8 @@ class main_window:
         # OBJECTS
         self.background = gt.Image((0,0),"Image/black.png")
         self.input = gt.InputBox((0,0),(100,30), text="test")
-        self.all_sprites.add(self.input)
         self.all_sprites.add(self.background)
+        self.all_sprites.add(self.input)
 
         # Call
         self.call_menu()
@@ -70,6 +70,7 @@ class main_window:
     def events(self):
         all_events = pygame.event.get()
         self.all_sprites.event(all_events)
+
         if all_events==[]:
             if self.menu_is_running:
                 #self.menu.event()
@@ -88,7 +89,6 @@ class main_window:
 
     def draw(self):
         self.all_sprites.draw(self.screen)
-        self.background.draw(self.screen)
         #if self.menu_is_running:
         #    self.menu.group_main_menu.draw(self.screen)
         if self.keep_screen_proportion:

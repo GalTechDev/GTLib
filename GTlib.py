@@ -137,7 +137,7 @@ class Group:
     
 
 class Square(pygame.sprite.Sprite, Sprite):
-    def __init__(self, position: tuple[int,int], color, size: tuple[int,int], rotation: float=0, alpha: int=255):
+    def __init__(self, position: tuple[int,int], size: tuple[int,int], rotation: float=0, alpha: int=255 , color="blank"):
         '''Make a simple square that include some methode.'''
         pygame.sprite.Sprite.__init__(self)
         Sprite.__init__(self,position,size,rotation,alpha)
@@ -187,6 +187,7 @@ class InputBox(pygame.sprite.Sprite, Sprite):
     def __init__(self, position: tuple[int,int], size: tuple[int,int]=(0,0), rotation: float=0, alpha: int=255, text: str='', inactive_color=COLOR_INACTIVE, active_color=COLOR_ACTIVE,font=FONT, min_char: int=0 ,max_char: int=None, default_text: str="", autolock: bool=False, continute_intup: bool=False):
         '''An input box object: Need event() and draw() fonction call to work correctly'''
         pygame.sprite.Sprite.__init__(self)
+        #self.surface = pygame.Surface(size)
         Sprite.__init__(self,position,size,rotation,alpha)
         
         self.active = False
@@ -194,7 +195,7 @@ class InputBox(pygame.sprite.Sprite, Sprite):
         self.active_color = active_color
         self.color = inactive_color
         self.default_text = default_text
-        self.text = Text(self.rect.x, self.rect.y, size[0],size[1], text, hidden=True)
+        self.text = Text(position, size, 0, 255, text)
         self.text.font = font
 
         self.autolock = autolock
@@ -208,10 +209,10 @@ class InputBox(pygame.sprite.Sprite, Sprite):
     def event(self, events:list):
         if not self.active and not self.valide:
             if self.get()=="":
-                self.text.text = self.default_text
+                self.text.set_text(self.default_text)
 
         if self.Backspace_pressed and not self.valide:
-            self.text.text = self.text.text[:-1]
+            self.text.pop(len(self.text.get_text())-1)
             if not self.cont_input:
                 self.Backspace_pressed=False
 
@@ -247,79 +248,66 @@ class InputBox(pygame.sprite.Sprite, Sprite):
 
                     else:
                         if event.key == pygame.K_v and pygame.key.get_mods() & pygame.KMOD_CTRL:
-                            self.text.text = str(pyperclip.paste())
+                            self.text.add(str(pyperclip.paste()))
                         elif self.max_char == None:
-                            self.text.text += event.unicode
-                        elif len(self.text.text)<self.max_char:
-                            self.text.text += event.unicode
-
-            if self.max_char == None:
-                self.update()
-        # Re-render the text.
-        self.text.txt_surface = self.text.font.render(self.text.text, True, self.color)
+                            self.text.add(event.unicode)
+                        elif len(self.text.get_text())<self.max_char:
+                            self.text.add(event.unicode)
 
     def update(self):
         '''Internal fonction, please don't use it.'''
         # Resize the box if the text is too long.
-        width = max(self.surface.get_size()[0], self.text.txt_surface.get_width()+10)
-        self.set_size((width,self.get_size()[1]))
+        if self.max_char == None:
+            width = max(self.surface.get_size()[0], self.text.get_size()[1]+10)
+            self.set_size((width,self.get_size()[1]))
         pos = self.get_pos()
         self.set_pos(pos)
+        self.text.rect.centery = self.rect.centery
 
     def get(self) -> str:
         '''Return entered text.'''
-        return self.text.text
+        return self.text.get_text()
 
     def draw(self, screen):
         # Blit the text.
         new_surface = self.surface.copy()
+        new_surface.fill("green")
         self.text.draw(new_surface)
         pygame.draw.rect(new_surface, self.color, self.rect, 2)
-        new_surface = pygame.transform.rotate(new_surface,self.angle)
-        new_surface.set_alpha(self.alpha)
-        screen.blit(new_surface, self.rect)
+        self.blit(screen, new_surface)
 
-        
-        
-
-class Text():
-    def __init__(self, x:int, y:int, w:int, h:int, text:str, data: str="", color: str="White", font=FONT, hidden: bool=False):
+class Text(Sprite):
+    def __init__(self, position, size, rotation, alpha, text:str, color: str="White", font=FONT):
         '''A Text object: Need to call draw() intern fonction to work'''
-        self.rect = pygame.Rect(x, y, w, h)
-        self.rect.x = x
-        self.rect.y = y
+        Sprite.__init__(self, position, size, rotation, alpha)
+        
         self.color = color
-        self.data = data
         self.text = text
         self.font = font
-        self.txt_surface = self.font.render(self.text, True, self.color)
-        self.hidden = hidden
 
-    def set_pos(self, x: int=None, y: int=None):
-        if not x==None:
-            self.rect.x = x
-        if not y==None:
-            self.rect.y = y
+        self.surface = self.font.render(self.text, True, self.color)
+        self.set_pos(position)
 
     def set_text(self, new_text: str):
         self.text = new_text
-        self.txt_surface = self.font.render(self.text, True, self.color)
-
-    def set_data(self, new_data):
-        self.data = new_data
+        self.surface = self.font.render(self.text, True, self.color)
 
     def get_text(self):
         return self.text
 
-    def get_data(self):
-        return self.data
+    def set_font(self, font):
+        self.font = font
 
     def draw(self, screen):
         # Blit the text.
-        screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
-        # Blit the rect.
-        if not self.hidden:
-            pygame.draw.rect(screen, self.color, self.rect, 2)
+        self.blit(screen, self.surface)
+        
+    def add(self,ch):
+        self.set_text(self.get_text()+ch)
+
+    def pop(self, index=0):
+        if index>=0 and index<len(self.text):
+            self.set_text(self.text[:index]+self.text[index+1:])
 
 class Bouton(pygame.sprite.Sprite):
     def __init__(self, x: int, y: int, square:Square, text: Text=None, color_hover=None, color_clic=None):
@@ -374,21 +362,16 @@ class Bouton(pygame.sprite.Sprite):
         if not self.text==None:
             self.text.draw(screen)
         
-class Checkbox(pygame.sprite.Sprite):
-    def __init__(self, x: int, y: int, size: int, check_str: str="X",color_bg="white", color_rect="black", color_check="black", is_check: bool=False, check_str_size: int=None):
+class Checkbox(pygame.sprite.Sprite, Sprite):
+    def __init__(self, position, size: int, rotation, alpha, check_str: str="X",color_bg="white", color_rect="black", color_check="black", is_check: bool=False, check_str_size: int=None):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((size,size))
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
-        self.size = size
+        Sprite.__init__(self, position, size, rotation, alpha)
+        
         self.color_rect = color_rect
-
         self.color_bg = color_bg
-        self.square = Square(x,y,self.color_bg,self.size,self.size)
 
-        self.check_str_size = check_str_size if not check_str_size is None else self.size
-        self.check = Text(x+size//10,y+size//15,size,size,check_str,color=color_check,font=pygame.font.Font(None,self.check_str_size), hidden=True)
+        self.check_str_size = check_str_size if not check_str_size is None else size
+        self.check = Text((0,0),(size,size), 0, 255, check_str, color=color_check,font=pygame.font.Font(None,self.check_str_size))
         self.is_check = is_check
 
     def event(self, events):
@@ -397,11 +380,20 @@ class Checkbox(pygame.sprite.Sprite):
                 if self.rect.collidepoint(relative_mouse_pos(SCREEN)):
                     self.is_check = not self.is_check
 
+    def update(self):
+        pos = self.get_pos()
+        self.set_pos(pos)
+        self.check.rect.centery = self.rect.centery
+        self.check.rect.centerx = self.rect.centerx
+
     def draw(self, screen):
-        self.square.draw(screen)
-        pygame.draw.rect(screen, self.color_rect, self.rect, 2)
+        new_surface = self.surface.copy()
+        new_surface.fill(self.color_bg)
         if self.is_check:
-            self.check.draw(screen)
+            self.check.draw(new_surface)
+        pygame.draw.rect(new_surface, self.color_rect, self.rect, 2)
+        self.blit(screen, new_surface)
+        
         
 class Cursor(pygame.sprite.Sprite):
     def __init__(self,x,y,size_x,size_y,square_size_x,square_size_y,vertical=False, horizontal=False):
@@ -548,5 +540,4 @@ def relative_mouse_pos(surface_size):
     original_size = surface_size
     absolut_pos = pygame.mouse.get_pos()
     relative_pos = ((int(original_size[0]/final_size[0]*absolut_pos[0]),int(original_size[1]/final_size[1]*absolut_pos[1])))
-    print(relative_pos)
     return(relative_pos)
