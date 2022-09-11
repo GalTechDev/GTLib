@@ -21,10 +21,12 @@ def is_import(module: str=None,modules: list=[]):
 
 try:
     pygame.init()
-    FONT = pygame.font.SysFont(None, 32)
+    pyperclip.paste
+
     COLOR_TEXT = pygame.Color('floralwhite')
-    COLOR_INACTIVE = pygame.Color('lightskyblue3')
-    COLOR_ACTIVE = pygame.Color('dodgerblue2')
+    COLOR_TEXT_INACTIVE = pygame.Color('lightskyblue3')
+    COLOR_TEXT_ACTIVE = pygame.Color('dodgerblue2')
+    BLACK = pygame.Color('black')
 except:
     is_import(modules=["pygame","pyperclip"])
 
@@ -32,6 +34,13 @@ global SCREEN
 SCREEN = None
 FPS = 60
 all_groupe = []
+
+topleft = 7
+topright = 9
+center = 5
+bottomleft = 1
+bottomright = 3
+
 
 class Window:
     def __init__(self,window_size,screen_resolution,title:str="pygame window"):
@@ -54,7 +63,7 @@ class Window:
         self.is_running=True
 
         # OBJECTS
-        self.background = Square(position=(0,0),size=SCREEN, color="black")
+        self.background = Square(position=(0,0),size=SCREEN, color="green")
         
     def set_background_color(self,new_color):
         self.background.set_color(new_color)
@@ -129,16 +138,30 @@ class Sprite:
         self.surface = pygame.Surface(size,pygame.SRCALPHA,32) 
         self.set_pos(position)
 
+    def set_color_surface(self, color=None):
+        if color==None:
+            self.set_surface(self.get_size(),self.get_pos())
+        else:
+            self.surface.fill(color)
+
     def set_rotation(self, angle: float):
         self.angle = angle
 
     def get_rotation(self):
         return self.angle
 
-    def set_pos(self, position: tuple[int,int]):
+    def set_pos(self, position: tuple[int,int], point = topleft):
         self.rect = self.surface.get_rect()
-        self.rect.x = position[0]
-        self.rect.y = position[1]
+        if point==topleft:
+            self.rect.topleft = position
+        elif point==topright:
+            self.rect.topright = position
+        elif point==center:
+            self.rect.center = position
+        elif point==bottomleft:
+            self.rect.bottomleft = position
+        elif point==bottomright:
+            self.rect.bottomright = position
 
     def get_pos(self):
         return (self.rect.x,self.rect.y)
@@ -151,6 +174,9 @@ class Sprite:
 
     def set_size(self, size: tuple[int,int]):
         self.surface = pygame.transform.scale(self.surface,size)
+        self.rect.width = size[0]
+        self.rect.height = size[1]
+        
 
     def get_size(self):
         return self.surface.get_size()
@@ -173,7 +199,7 @@ class Sprite:
         return self.rect.colliderect(rect)
 
     def draw(self, screen):
-        pass
+        self.blit(screen, self.surface)
 
     def update(self):
         pass
@@ -257,6 +283,17 @@ class Menu(Sprite):
         super().__init__(position, size, rotation, alpha)
         self.all_sprits=Group()
 
+    def draw(self, screen):
+        surface = self.surface.copy()
+        self.all_sprits.draw(surface)
+        self.blit(screen, surface)
+
+    def event(self, events):
+        self.all_sprits.event(events)
+
+    def update(self):
+        self.all_sprits.update()
+
 class Square(Sprite):
     def __init__(self, position: tuple[int,int], size: tuple[int,int], rotation: float=0, alpha: int=255 , color="black"):
         '''Make a simple square that include some methode.'''
@@ -303,102 +340,9 @@ class Image(Sprite):
 
     def draw(self, screen):
         self.blit(screen, self.surface) #pygame.transform.scale(self.surface, self.get_size()
-
-class InputBox(Sprite):
-    def __init__(self, position: tuple[int,int], size: tuple[int,int]=(0,0), rotation: float=0, alpha: int=255, text: str='', inactive_color=COLOR_INACTIVE, active_color=COLOR_ACTIVE,font=FONT, min_char: int=0 ,max_char: int=None, default_text: str="", autolock: bool=False, continute_intup: bool=False):
-        '''An input box object: Need event() and draw() fonction call to work correctly'''
-        #pygame.sprite.Sprite.__init__(self)
-        #self.surface = pygame.Surface(size)
-        Sprite.__init__(self,position,size,rotation,alpha)
-        
-        self.active = False
-        self.inactive_color = inactive_color
-        self.active_color = active_color
-        self.color = inactive_color
-        self.default_text = default_text
-        self.text = Text(position, size, 0, 255, text)
-        self.text.font = font
-
-        self.autolock = autolock
-        self.cont_input = continute_intup
-        self.valide = False
-        self.Backspace_pressed = False
-        self.min_char = min_char
-        self.max_char = max_char
-        self.idx_cursor = 0
-        
-    def event(self, events:list):
-        if not self.active and not self.valide:
-            if self.get()=="":
-                self.text.set_text(self.default_text)
-
-        if self.Backspace_pressed and not self.valide:
-            self.text.pop(len(self.text.get_text())-1)
-            if not self.cont_input:
-                self.Backspace_pressed=False
-
-        for event in events:
-            if event.type == pygame.MOUSEBUTTONUP:
-                if self.collidepoint(relative_mouse_pos(SCREEN)):
-                    self.active = not self.active
-                else:
-                    self.active = False
-                self.color = self.active_color if self.active and not self.valide else self.inactive_color
-
-            if event.type == pygame.KEYUP:
-                self.Backspace_pressed = False
-
-            if event.type == pygame.KEYDOWN:
-                if self.active and not self.valide:
-                    if event.key == pygame.K_BACKSPACE:
-                        self.Backspace_pressed = True
-
-                    elif event.key == pygame.K_RETURN:
-                        if self.autolock:
-                            self.valide = True
-                            self.Backspace_pressed=False
-                            self.color = self.inactive_color
-
-                    elif event.key == pygame.K_LEFT:
-                        if self.active and self.idx_cursor>0:
-                            self.idx_cursor-=1
-
-                    elif event.key == pygame.K_RIGHT:
-                        if self.active and self.idx_cursor<len(self.get()):
-                            self.idx_cursor+=1
-
-                    else:
-                        if event.key == pygame.K_v and pygame.key.get_mods() & pygame.KMOD_CTRL:
-                            self.text.add(str(pyperclip.paste()))
-                        elif self.max_char == None:
-                            self.text.add(event.unicode)
-                        elif len(self.text.get_text())<self.max_char:
-                            self.text.add(event.unicode)
-
-    def update(self):
-        '''Internal fonction, please don't use it.'''
-        # Resize the box if the text is too long.
-        if self.max_char == None:
-            width = max(self.surface.get_size()[0], self.text.get_size()[1]+10)
-            self.set_size((width,self.get_size()[1]))
-        pos = self.get_pos()
-        self.set_pos(pos)
-        self.text.rect.centery = self.rect.centery
-
-    def get(self) -> str:
-        '''Return entered text.'''
-        return self.text.get_text()
-
-    def draw(self, screen):
-        # Blit the text.
-        new_surface = self.surface.copy()
-        new_surface.fill("green")
-        self.text.draw(new_surface)
-        pygame.draw.rect(new_surface, self.color, self.rect, 2)
-        self.blit(screen, new_surface)
-
+      
 class Text(Sprite):
-    def __init__(self, position, size, text:str, rotation=0, alpha=255, color: str="white", font=FONT):
+    def __init__(self, position, size, text:str, rotation=0, alpha=255, color: str="white", font=pygame.font.SysFont(None, 32)):
         '''A Text object: Need to call draw() intern fonction to work'''
         Sprite.__init__(self, position, size, rotation, alpha)
         
@@ -406,12 +350,13 @@ class Text(Sprite):
         self.text = text
         self.font = font
         self.surface = self.font.render(self.text, True, self.color)
-        self.surface.set_alpha()
+        self.surface.set_alpha(alpha)
         self.set_pos(position)
 
     def set_text(self, new_text: str):
         self.text = new_text
         self.surface = self.font.render(self.text, True, self.color)
+        
 
     def get_text(self):
         return self.text
@@ -421,6 +366,7 @@ class Text(Sprite):
 
     def draw(self, screen):
         # Blit the text.
+        
         self.blit(screen, self.surface)
         
     def add(self,ch):
@@ -429,6 +375,54 @@ class Text(Sprite):
     def pop(self, index=0):
         if index>=0 and index<len(self.text):
             self.set_text(self.text[:index]+self.text[index+1:])
+
+class InputBox(Text):
+    def __init__(self, position, size, text: str, rotation=0, alpha=255, color: str = "white", font=pygame.font.SysFont(None, 32)):
+        super().__init__(position, size, text+"|", rotation, alpha, color, font)
+        
+        self.is_placeholder = False
+        self.inx = -1
+
+    def event(self, events):
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_BACKSPACE:
+                    self.set_text(self.get_text()[:self.inx-1]+self.get_text()[self.inx:])
+                elif event.key == pygame.K_LEFT:
+                    if self.inx>-len(self.get_text()):
+                        if self.inx!=-1:
+                            txt = self.get_text()
+                            txt = txt[:self.inx-1]+"|"+txt[self.inx-1:self.inx]+txt[self.inx+1:]
+                            self.inx-=1
+                        else:
+                            txt = self.get_text()[:self.inx]
+                            self.inx-=1
+                            txt = txt[:self.inx+1]+"|"+txt[self.inx+1:]
+                        
+                        self.set_text(txt)
+                        
+                elif event.key == pygame.K_RIGHT:
+                    if self.inx<-1:
+                        if self.inx == -2:
+                            txt = self.get_text()
+                            txt = txt[:-2]+txt[-1:]+"|"
+                            self.inx+=1
+                            
+                        elif self.inx!=-len(self.get_text()):
+                            txt = self.get_text()
+                            txt = txt[:self.inx]+txt[self.inx+1:self.inx+2]+"|"+txt[self.inx+2:]
+                            self.inx+=1
+                        
+                        else:
+                            txt = self.get_text()[1:2]+"|"+self.get_text()[2:]
+                            self.inx+=1
+                        
+                        self.set_text(txt)
+
+
+                else:
+                    self.set_text(self.get_text()[:self.inx]+event.unicode+self.get_text()[self.inx:])
+
 
 class Bouton(Sprite):
     def __init__(self, position: tuple[int, int], size: tuple[int, int], square: Square, text: Text = None, rotation: float = 0, alpha: int = 255, color_hover=None,color_clic=None):
