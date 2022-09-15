@@ -1,5 +1,5 @@
 from Graphics_Engine.main import *
-from GTlib import *
+
 
 
 class Window:

@@ -8,6 +8,7 @@ class Scene:
         self.load()
 
     def add_object(self, obj):
+
         self.objects.append(obj)
 
     def load(self):
@@ -19,7 +20,7 @@ class Scene:
             for z in range(-n, n, s):
                 add(Cube(app, pos=(x, -s, z)))
 
-        add(Cat(app, pos=(0, -2, -10)))
+        #add(Cat(app, pos=(0, -2, -10)))
 
     def render(self):
         for obj in self.objects:
