@@ -14,9 +14,17 @@ class Mesh:
             self.vao.vbo.vbos[name] = vbo.ObjVBO(app, path)
             self.vao.vaos[name] = self.vao.get_vao(program=self.vao.program.programs['default'], vbo=self.vao.vbo.vbos[name])
 
-    def add_texture(self, path, name):
+    def add_texture(self, name, path=None, color=None):
         if not name in self.texture.textures.keys():
-            self.texture.textures.update({name:self.texture.get_texture(path=path)})
+            if (path!=None and color!=None) or (path==None and color==None):
+                raise Exception("You must give path OR color")
+            else:
+                if path!=None:
+                    texture=self.texture.get_texture(path=path)
+                else:
+                    texture=self.texture.get_color(color=color)
+
+            self.texture.textures.update({name:texture})
 
     def destroy(self):
         self.vao.destroy()

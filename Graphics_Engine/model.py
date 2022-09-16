@@ -90,7 +90,7 @@ class Cat(BaseModel):
 
 
 class Obj(BaseModel):
-    def __init__(self, app, mesh_name, tex_id, pos=(0, 0, 0), rot=(0, 0, 0), scale=(1, 1, 1)):
+    def __init__(self, app, mesh_name, tex_id="grey", pos=(0, 0, 0), rot=(0, 0, 0), scale=(1, 1, 1)):
         super().__init__(app, mesh_name, tex_id, pos, rot, scale)
         self.on_init()
 

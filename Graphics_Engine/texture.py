@@ -9,7 +9,20 @@ class Texture:
         self.textures[0] = self.get_texture(path='Graphics_Engine/textures/img.png')
         self.textures[1] = self.get_texture(path='Graphics_Engine/textures/img_1.png')
         self.textures[2] = self.get_texture(path='Graphics_Engine/textures/img_2.png')
-        self.textures['cat'] = self.get_texture(path='Graphics_Engine/objects/cat/20430_cat_diff_v1.jpg')
+        self.textures['grey'] = self.get_color("grey")
+        
+
+    def get_color(self, color):
+        texture = pg.Surface((1,1))
+        texture.fill(color)
+        texture = self.ctx.texture(size=texture.get_size(), components=3,
+                                   data=pg.image.tostring(texture, 'RGB'))
+        # mipmaps
+        texture.filter = (mgl.LINEAR_MIPMAP_LINEAR, mgl.LINEAR)
+        texture.build_mipmaps()
+        # AF
+        texture.anisotropy = 32.0
+        return texture
 
     def get_texture(self, path):
         texture = pg.image.load(path).convert()
