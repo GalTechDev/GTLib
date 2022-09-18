@@ -5,6 +5,8 @@ class ShaderProgram:
         self.ctx = ctx
         self.programs = {}
         self.programs['default'] = self.get_program('default')
+        self.programs['env'] = self.get_program('env')
+        print(self.programs.keys())
 
     def get_program(self, shader_program_name):
         with open(f'Graphics_Engine/shaders/{shader_program_name}.vert') as file:

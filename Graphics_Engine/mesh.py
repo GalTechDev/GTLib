@@ -14,6 +14,24 @@ class Mesh:
             self.vao.vbo.vbos[name] = vbo.ObjVBO(app, path)
             self.vao.vaos[name] = self.vao.get_vao(program=self.vao.program.programs['default'], vbo=self.vao.vbo.vbos[name])
 
+    def add_cube_texture(self, name, dir_path=None, color=None, ext=".png"):
+        if not name in self.texture.textures.keys():
+            if (dir_path!=None and color!=None) or (dir_path==None and color==None):
+                raise Exception("You must give path OR color")
+            else:
+                if dir_path!=None:
+                    texture=self.texture.get_texture_cube(dir_path=dir_path, ext=ext)
+                else:
+                    texture=self.texture.get_color_cube(color=color)
+
+            self.texture.textures.update({name:texture})
+
+
+
+        if not name in self.texture.textures.keys():
+            texture=self.texture.get_texture_cube(dir_path=dir_path, ext=ext)
+            self.texture.textures.update({name:texture})
+
     def add_texture(self, name, path=None, color=None):
         if not name in self.texture.textures.keys():
             if (path!=None and color!=None) or (path==None and color==None):
