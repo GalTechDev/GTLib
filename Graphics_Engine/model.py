@@ -17,6 +17,7 @@ class BaseModel:
         self.physic = []
         self.mase_vol = 1
         self.vel = (0,0,0)
+        self.rot_vel = (0,0,0)
 
     def update(self): ...
 
@@ -44,6 +45,10 @@ class BaseModel:
         self.rot = glm.vec3([glm.radians(a) for a in new_rot])
         self.m_model = self.get_model_matrix()
 
+    def get_rot(self):
+        return glm.vec3([glm.degrees(a) for a in self.rot])
+        
+
     def set_scale(self, new_scale):
         self.scale = new_scale
         self.m_model = self.get_model_matrix()
@@ -62,6 +67,11 @@ class ExtendedBaseModel(BaseModel):
         self.program['camPos'].write(self.camera.position)
         self.program['m_view'].write(self.camera.m_view)
         self.program['m_model'].write(self.m_model)
+        self.custom_update()
+        self.m_model = self.get_model_matrix()
+
+    def custom_update(self):
+        pass
 
     def on_init(self):
         # texture
