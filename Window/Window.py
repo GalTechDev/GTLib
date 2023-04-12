@@ -6,7 +6,7 @@ def _void(*args):
     pass
 
 class Window:
-    def __init__(self, show_fps=False):
+    def __init__(self, show_fps=True):
         pg.init()
         self.screen = pg.display.set_mode((800,800), flags=pg.DOUBLEBUF)
 
