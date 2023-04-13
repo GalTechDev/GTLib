@@ -1,24 +1,22 @@
 import pygame as pg
-import pygame.freetype as ft
 import sys
 
-def _void(*args):
+def void(*args):
     pass
 
-class Window:
-    def __init__(self, show_fps=True):
+class Base:
+    def __init__(self, size: tuple):
         pg.init()
-        self.screen = pg.display.set_mode((800,800), flags=pg.DOUBLEBUF)
+        
+        self.size = size
+        self.screen = pg.display.set_mode(size, flags=pg.DOUBLEBUF)
 
         self.clock = pg.time.Clock()
-        self.font = ft.SysFont('Verdana', 15)
 
         self.dt = 0.0
-        if not show_fps:
-            self.draw_fps = _void
 
-        self.custom_update = [_void]
-        self.custom_event = [_void]
+        self.custom_update = [void]
+        self.custom_event = [void]
 
     def update(self):
         #decorator for custom update
@@ -33,13 +31,8 @@ class Window:
 
         return add_custom
 
-    def draw_fps(self):
-        fps = f'{self.clock.get_fps() :.0f} FPS'
-        self.font.render_to(self.screen, (0, 0), text=fps, fgcolor='green', bgcolor='black')
-
     def draw(self):
         self.screen.fill('black')
-        self.draw_fps()
 
     def event(self):
         #decorator for custom update
@@ -61,8 +54,3 @@ class Window:
             self.event()
             self.update()
             self.draw()
-
-
-if __name__ == '__main__':
-    app = Window()
-    app.run()

@@ -1,15 +1,12 @@
 import UI
-from Window import *
+from Window.Advanced_Window import *
 import pygame as pg
 
-app = Window.Window(show_fps=True)
-
-@app.update()
-def test_update():
-    pass
+app = Advanced(size=(800,800), show_fps=True)
 
 @app.event()
-def test_event(event):
-    pass
+def switch_fps(event):
+    if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_F3):
+        app.show_fps(not app.fps_enable)
 
 app.run()
