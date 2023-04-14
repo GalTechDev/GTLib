@@ -3,8 +3,8 @@ from .Base_Windows import *
 import pygame.freetype as ft
 
 class Advanced(Base):
-    def __init__(self, size: tuple, show_fps: bool=True):
-        super().__init__(size)
+    def __init__(self, size: tuple, fps: int=60, show_fps: bool=True):
+        super().__init__(size, fps)
 
         self.show_fps(show_fps)
 

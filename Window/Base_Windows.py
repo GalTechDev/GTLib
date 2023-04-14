@@ -5,12 +5,13 @@ def void(*args):
     pass
 
 class Base:
-    def __init__(self, size: tuple):
+    def __init__(self, size: tuple, fps:int = 60):
         pg.init()
         
         self.size = size
         self.screen = pg.display.set_mode(size, flags=pg.DOUBLEBUF)
 
+        self.fps = fps
         self.clock = pg.time.Clock()
 
         self.dt = 0.0
@@ -27,7 +28,7 @@ class Base:
         #update        
         [f() for f in self.custom_update]
         pg.display.flip()
-        self.dt = self.clock.tick() * 0.001
+        self.dt = self.clock.tick(self.fps) * 0.001
 
         return add_custom
 
