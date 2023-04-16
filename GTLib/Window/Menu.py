@@ -8,15 +8,15 @@ class Menu:
         self.custom_update = [void]
         self.custom_event = [void]
 
-    def add_sprite():
-        pass
+    def add_sprite(self, sprite):
+        self.objects.append(sprite)
 
-    def remove_sprite():
-        pass
+    def remove_sprite(self, sprite):
+        self.objects.remove(sprite)
 
     def draw(self, screen):
         for object in self.objects:
-            object.blit(screen, self.surface)
+            object.draw(screen)
 
     def update(self):
         #decorator for custom update

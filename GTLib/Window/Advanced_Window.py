@@ -21,7 +21,17 @@ class Advanced(Base):
         font.render_to(self.screen, (0, 0), text=fps, fgcolor='green', bgcolor='black')
 
     def draw(self):
+        #decorator for custom update
+        def add_custom(func):
+            self.custom_update.append(func)
+            return func
+
         self.screen.fill('black')
+        
+        #update        
+        [f() for f in self.custom_update]
+        for m in self.menu:
+            m.draw(self.screen)
         self.draw_fps()
 
 if __name__ == '__main__':

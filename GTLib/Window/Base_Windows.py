@@ -2,6 +2,8 @@ import pygame as pg
 import sys
 from ..Tools.function import void
 from .Menu import *
+import asyncio
+
 
 class Base:
     def __init__(self, size: tuple, fps:int = 60):
@@ -19,6 +21,7 @@ class Base:
 
         self.custom_update = [void]
         self.custom_event = [void]
+        self.custom_draw = [void]
 
     def drop_menu(self, menu: Menu):
         """
@@ -71,13 +74,25 @@ class Base:
         
         #update        
         [f() for f in self.custom_update]
+        for m in self.menu:
+            m.update()
         pg.display.flip()
         self.dt = self.clock.tick(self.fps) * 0.001
 
         return add_custom
 
-    def draw(self):
+    async def draw(self):
+        #decorator for custom update
+        def add_custom(func):
+            self.custom_update.append(func)
+            return func
+
         self.screen.fill('black')
+        
+        #update        
+        [f() for f in self.custom_update]
+        for m in self.menu:
+            m.draw(self.screen)
 
     def event(self):
         #decorator for custom update
@@ -88,6 +103,8 @@ class Base:
         #event
         for e in pg.event.get():
             [f(e) for f in self.custom_event]
+            for m in self.menu:
+                m.event(e)
             if e.type == pg.QUIT or (e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE):
                 pg.quit()
                 sys.exit()
