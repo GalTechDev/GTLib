@@ -1,6 +1,6 @@
 import pygame as pg
 import sys
-from ..Tools import *
+from ..Tools.function import void
 from .Menu import *
 
 class Base:
