@@ -1,0 +1,2 @@
+def void(*args):
+    pass
