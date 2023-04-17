@@ -94,6 +94,8 @@ class Base:
         for m in self.menu:
             m.draw(self.screen)
 
+        return add_custom
+
     def event(self):
         #decorator for custom update
         def add_custom(func):

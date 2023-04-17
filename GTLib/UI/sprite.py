@@ -154,7 +154,7 @@ class Group:
 
         return add_custom
 
-    def event(self, events):
+    def event(self, events=None):
         #decorator for custom update
         def add_custom(func):
             self.custom_event.append(func)
@@ -164,6 +164,8 @@ class Group:
         [f(events) for f in self.custom_event]
         for sprite in self.all_sprite:
             sprite.event(events)
+
+        return add_custom
 
     def draw(self, screen):
         for sprite in self.all_sprite:

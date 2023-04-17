@@ -31,7 +31,7 @@ class Menu:
 
         return add_custom
 
-    def event(self, events):
+    def event(self, events=None):
         #decorator for custom update
         def add_custom(func):
             self.custom_event.append(func)
@@ -41,3 +41,5 @@ class Menu:
         [f(events) for f in self.custom_event]
         for object in self.objects:
             object.event(events)
+
+        return add_custom
