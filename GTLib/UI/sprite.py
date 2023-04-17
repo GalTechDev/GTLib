@@ -99,6 +99,9 @@ class Sprite:
 class Group:
     def __init__(self):
         self.all_sprite = []
+
+        self.custom_update = [void]
+        self.custom_event = [void]
     
     def __len__(self):
         return len(self.all_sprite)
