@@ -38,8 +38,9 @@ class Menu:
             return func
         
         #event
-        [f(events) for f in self.custom_event]
-        for object in self.objects:
-            object.event(events)
+        if events!=None:
+            [f(events) for f in self.custom_event]
+            for object in self.objects:
+                object.event(events)
 
         return add_custom

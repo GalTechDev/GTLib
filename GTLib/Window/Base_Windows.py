@@ -29,7 +29,7 @@ class Base:
         Raise Exeption if not called
         """
         layer = self.get_layer(menu)
-        if layer == False:
+        if layer == -1:
             raise Exception("The gived menu is not found, unable to drop it")
         else:
             self.menu.pop(layer)
@@ -62,7 +62,7 @@ class Base:
         Return -1 if not found
         """
         for i, m in enumerate(self.menu):
-            if m is menu:
+            if m == menu:
                 return i
         return -1
 
@@ -107,9 +107,6 @@ class Base:
             [f(e) for f in self.custom_event]
             for m in self.menu:
                 m.event(e)
-            if e.type == pg.QUIT or (e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE):
-                pg.quit()
-                sys.exit()
 
         return add_custom
 
