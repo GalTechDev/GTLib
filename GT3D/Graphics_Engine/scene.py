@@ -1,4 +1,4 @@
-from Graphics_Engine.model import *
+from .model import *
 
 
 class Scene:

@@ -1,6 +1,6 @@
-from Graphics_Engine.vao import VAO
-from Graphics_Engine import vbo
-from Graphics_Engine.texture import Texture
+from .vao import VAO
+from . import vbo
+from .texture import Texture
 
 
 class Mesh:

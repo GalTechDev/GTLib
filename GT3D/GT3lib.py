@@ -1,4 +1,4 @@
-from Graphics_Engine.main import *
+from .Graphics_Engine.main import *
 
 
 

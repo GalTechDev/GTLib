@@ -2,13 +2,14 @@ import pygame as pg
 import moderngl as mgl
 
 
+
 class Texture:
     def __init__(self, ctx):
         self.ctx = ctx
         self.textures = {}
-        self.textures[0] = self.get_texture(path='Graphics_Engine/textures/img.png')
-        self.textures[1] = self.get_texture(path='Graphics_Engine/textures/img_1.png')
-        self.textures[2] = self.get_texture(path='Graphics_Engine/textures/img_2.png')
+        self.textures[0] = self.get_texture(path='GT3D/Graphics_Engine/textures/img.png')
+        self.textures[1] = self.get_texture(path='GT3D/Graphics_Engine/textures/img_1.png')
+        self.textures[2] = self.get_texture(path='GT3D/Graphics_Engine/textures/img_2.png')
         self.textures['grey'] = self.get_color("grey")
                 
 
