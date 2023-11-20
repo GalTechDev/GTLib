@@ -1,7 +1,6 @@
-import GTlib as gt
-
+import GT2D as gt
+import pygame
 SCREEN = (1000,800)
-gt.SCREEN = SCREEN
 
 class Menu1(gt.Menu):
     def __init__(self, position: tuple[int, int], size: tuple[int, int], rotation: float = 0, alpha: int = 255):
@@ -16,8 +15,8 @@ class Menu1(gt.Menu):
 
     def event(self, events):
         self.all_sprits.event(events)
-        self.square.set_pos(gt.relative_mouse_pos(gt.SCREEN), gt.center)
-        self.titre.set_pos(gt.relative_mouse_pos(gt.SCREEN))
+        self.square.set_pos(gt.tool.relative_mouse_pos(pygame.display.get_window_size()), gt.CENTER)
+        self.titre.set_pos(gt.tool.relative_mouse_pos(pygame.display.get_window_size()))
 
 
 
