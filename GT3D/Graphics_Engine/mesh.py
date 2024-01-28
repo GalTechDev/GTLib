@@ -11,8 +11,11 @@ class Mesh:
 
     def add_obj(self, app, name, path):
         if not name in self.vao.vbo.vbos.keys():
-            self.vao.vbo.vbos[name] = vbo.ObjVBO(app, path)
-            self.vao.vaos[name] = self.vao.get_vao(program=self.vao.program.programs['default'], vbo=self.vao.vbo.vbos[name])
+            objvbo = vbo.ObjVBO(app, path)
+            print(objvbo.vbo)
+            if objvbo.vbo:
+                self.vao.vbo.vbos[name] = objvbo
+                self.vao.vaos[name] = self.vao.get_vao(program=self.vao.program.programs['default'], vbo=self.vao.vbo.vbos[name])
 
     def add_cube_texture(self, name, dir_path=None, color=None, ext=".png"):
         if not name in self.texture.textures.keys():

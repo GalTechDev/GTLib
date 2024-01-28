@@ -2,11 +2,11 @@ from turtle import forward
 import glm
 import pygame as pg
 
-FOV = 50  # deg
+FOV = 75  # deg
 NEAR = 0.1
 FAR = 100
 SPEED = 0.005
-SENSITIVITY = 0.04
+SENSITIVITY = 0.1
 
 
 class Camera_control_free:
@@ -48,7 +48,7 @@ class Camera_control_fps:
         if keys[pg.K_LCTRL]:
             self.position -= (0, velocity, 0)
 
-class Camera(Camera_control_fps):
+class Camera(Camera_control_free):
     def __init__(self, app, position=(0, 0, 4), yaw=-90, pitch=0):
         self.app = app
         self.aspect_ratio = app.WIN_SIZE[0] / app.WIN_SIZE[1]

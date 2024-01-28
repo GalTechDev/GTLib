@@ -24,7 +24,11 @@ class BaseVBO:
 
     def get_vbo(self):
         vertex_data = self.get_vertex_data()
-        vbo = self.ctx.buffer(vertex_data)
+        try:
+            print(vertex_data)
+            vbo = self.ctx.buffer(vertex_data)
+        except:
+            vbo = None
         return vbo
 
     def destroy(self):
@@ -85,8 +89,17 @@ class ObjVBO(BaseVBO):
 
     def get_vertex_data(self):
         objs = pywavefront.Wavefront(self.path, cache=True, parse=True)
-        obj = objs.materials.popitem()[1]
-        vertex_data = obj.vertices
+        vertex_data = []
+        #i=0
+        for obj in objs.materials.values(): 
+            data = list(obj.vertices)           
+            if data: 
+                if len(data)%3 != 0:
+                    continue
+                vertex_data += data
+                #i+=1
+            """if i==50:
+                break"""
         vertex_data = np.array(vertex_data, dtype='f4')
         return vertex_data
 
