@@ -91,15 +91,12 @@ class ObjVBO(BaseVBO):
         objs = pywavefront.Wavefront(self.path, cache=True, parse=True)
         vertex_data = []
         #i=0
-        for obj in objs.materials.values(): 
+        for k, obj in objs.materials.items(): 
             data = list(obj.vertices)           
             if data: 
                 if len(data)%3 != 0:
-                    continue
+                    print(f"failed loading {k}")
                 vertex_data += data
-                #i+=1
-            """if i==50:
-                break"""
         vertex_data = np.array(vertex_data, dtype='f4')
         return vertex_data
 
