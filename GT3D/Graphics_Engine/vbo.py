@@ -99,6 +99,14 @@ class ObjVBO(BaseVBO):
                 vertex_data += data
         vertex_data = np.array(vertex_data, dtype='f4')
         return vertex_data
+        
+class GroupVBO(BaseVBO):
+    def __init__(self, app, objs):
+        self.objs = objs
+        super().__init__(app)
+        self.format = '2f 3f 3f'
+        self.attribs = ['in_texcoord_0', 'in_normal', 'in_position']
+        
 
 
 
